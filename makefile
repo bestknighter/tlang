@@ -24,9 +24,6 @@ CD = cd
 # Make
 MAKE = make
 
-# Touch
-TOUCH = touch
-
 FLAGS = -std=c++11 -Wall -Wextra -fmax-errors=5 -Wno-unused-parameter -fdiagnostics-color=auto -Werror=init-self
 DPFLAGS = -M -MT $(OBJ_PATH)/$(*F).o -MP -MF $@
 RLFLAGS = -O3 -DDEBUG=0
@@ -64,9 +61,6 @@ RM = del /q
 # Make
 MAKE = mingw32-make
 
-# Touch
-TOUCH = echo $nul >>
-
 FLAGS += -mconsole
 LIBS := -lmingw32 $(LIBS)
 
@@ -82,33 +76,23 @@ endif
 .IGNORE: clean
 
 release: FLAGS += $(RLFLAGS)
-release: cache/all.txt
+release: $(EXEC)
 
 debug: FLAGS += $(DBFLAGS)
-debug: cache/all.txt
-
-cache/deps.txt: $(DEP_FILES)
-	-@$(TOUCH) cache/deps.txt
-
-cache/objs.txt: cache/deps.txt $(OBJ_FILES)
-	-@$(TOUCH) cache/objs.txt
-
-cache/all.txt: $(EXEC)
-	-@$(TOUCH) cache/all.txt
+debug: $(EXEC)
 
 clean:
-	-@$(RM) "$(OBJ_PATH)\*"
-	-@$(RM) "$(DEP_PATH)\*"
-	-@$(RM) "cache\*"
+	-@$(RM) "$(OBJ_PATH)\*.o"
+	-@$(RM) "$(DEP_PATH)\*.d"
 	-@$(RM) $(EXEC)
 
-$(DEP_PATH)/%.d: $(SRC_PATH)/%.cpp
+$(DEP_PATH)/%.d: $(INC_PATH)/%.hpp $(SRC_PATH)/%.cpp
 	$(COMPILER) $(INC_PATHS) $< $(DPFLAGS)
 
-$(OBJ_PATH)/%.o: $(SRC_PATH)/%.cpp
+$(OBJ_PATH)/%.o: $(DEP_PATH)/%.d
 	$(COMPILER) $(INC_PATHS) $< -c $(FLAGS) -o $@
 
-$(EXEC): cache/objs.txt
+$(EXEC): $(DEP_FILES) $(OBJ_FILES)
 	$(COMPILER) -o $@ $(OBJ_FILES) $(LIBS)
 
 
