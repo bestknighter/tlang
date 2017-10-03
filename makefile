@@ -1,6 +1,6 @@
 #################################################
 #												#
-#  Created by Gabriel Barbosa for SB - 2/2017	#
+#	Created by Gabriel Barbosa for SB - 2/2017	#
 #	 https://github.com/bestknighter/tlang		#
 #												#
 #################################################
@@ -72,7 +72,7 @@ endif
 #############################################################################################
 #############################################################################################
 
-.PHONY: clean release debug
+.PHONY: clean release debug folders
 .IGNORE: clean
 
 release: FLAGS += $(RLFLAGS)
@@ -82,14 +82,26 @@ debug: FLAGS += $(DBFLAGS)
 debug: $(EXEC)
 
 clean:
-	-@$(RM) "$(OBJ_PATH)\*.o"
-	-@$(RM) "$(DEP_PATH)\*.d"
+	-@$(RM) "$(DEP_PATH)\*"
+	-@$(RM) "$(OBJ_PATH)\*"
 	-@$(RM) $(EXEC)
 
-$(DEP_PATH)/%.d: $(INC_PATH)/%.hpp $(SRC_PATH)/%.cpp
+folders:
+ifeq ($(OS), Windows_NT)
+	@if NOT exist $(DEP_PATH) ( mkdir $(DEP_PATH) )
+	@if NOT exist $(OBJ_PATH) ( mkdir $(OBJ_PATH) )
+	@if NOT exist $(INC_PATH) ( mkdir $(INC_PATH) )
+	@if NOT exist $(SRC_PATH) ( mkdir $(SRC_PATH) )
+else
+	@mkdir -p $(DEP_PATH) $(OBJ_PATH) $(INC_PATH) $(SRC_PATH)
+endif
+
+$(DEP_PATH)/%.d: $(SRC_PATH)/%.cpp $(INC_PATH)/%.hpp | folders
+	$(COMPILER) $(INC_PATHS) $< $(DPFLAGS)
+$(DEP_PATH)/%.d: $(SRC_PATH)/%.cpp
 	$(COMPILER) $(INC_PATHS) $< $(DPFLAGS)
 
-$(OBJ_PATH)/%.o: $(DEP_PATH)/%.d
+$(OBJ_PATH)/%.o: $(SRC_PATH)/%.cpp $(DEP_PATH)/%.d | folders
 	$(COMPILER) $(INC_PATHS) $< -c $(FLAGS) -o $@
 
 $(EXEC): $(DEP_FILES) $(OBJ_FILES)
@@ -100,5 +112,5 @@ $(EXEC): $(DEP_FILES) $(OBJ_FILES)
 print-%:
 	@echo $* = $($*)
 
--include $(DEP_FILES)
+-include $$(DEP_FILES)
 	

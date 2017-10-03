@@ -1,9 +1,10 @@
-#include <cstdlib>
-#include <cstdio>
+
+
+#include "teste.hpp"
 
 int main( int argc, char** argv ) {
     
-    printf( "Hello world!\n" );
+    PrintHello();
 
     return 0;
 }
