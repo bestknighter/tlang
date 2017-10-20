@@ -98,7 +98,9 @@ endif
 
 $(DEP_PATH)/%.d: $(SRC_PATH)/%.cpp $(INC_PATH)/%.hpp | folders
 	$(COMPILER) $(INC_PATHS) $< $(DPFLAGS)
-$(DEP_PATH)/%.d: $(SRC_PATH)/%.cpp
+$(DEP_PATH)/%.d: $(SRC_PATH)/%.cpp | folders
+	$(COMPILER) $(INC_PATHS) $< $(DPFLAGS)
+$(DEP_PATH)/%.d: $(SRC_PATH)/%.hpp | folders
 	$(COMPILER) $(INC_PATHS) $< $(DPFLAGS)
 
 $(OBJ_PATH)/%.o: $(SRC_PATH)/%.cpp $(DEP_PATH)/%.d | folders

@@ -45,7 +45,9 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceRoot}"
+                "${workspaceRoot}",
+                "${workspaceRoot}/include",
+                "C:/msys64/mingw64/x86_64-w64-mingw32/include"
             ],
             "defines": [
                 "_DEBUG",
