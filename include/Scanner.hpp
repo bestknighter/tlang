@@ -3,7 +3,6 @@
 
 #include <string>
 #include <fstream>
-#include <cctype>
 
 class Scanner {
 	public:

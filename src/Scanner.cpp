@@ -29,8 +29,11 @@ void Scanner::SetFile( string file ) {
 }
 
 int Scanner::GetNextToken( string& nextToken ) {
-	nextToken = SearchNextToken();
+	do {
+		nextToken = SearchNextToken();
+	} while( "" == nextToken && '' != nextCh);
 	// Validar token
+	// Testar se esta funcionando ate chegar em EOF
 }
 
 string Scanner::SearchNextToken() {
@@ -42,7 +45,7 @@ string Scanner::SearchNextToken() {
 	std::locale loc;
 	while( true ) {
 		line.get(nextCh);
-		if( ' ' == nextCh || ',' == nextCh || '\t' == nextCh || '\n' == nextCh || ';' == nextCh ) {
+		if( ' ' == nextCh || ',' == nextCh || '\t' == nextCh || '\n' == nextCh || ';' == nextCh || '' == nextCh ) {
 			break;
 		}
 		nextToken += std::toupper( nextCh, loc );
