@@ -1,6 +1,8 @@
 #include "Scanner.hpp"
 
 #include <locale>
+#include <iostream>
+#include <cstdlib>
 
 Scanner* Scanner::instance = nullptr;
 
@@ -24,6 +26,10 @@ void Scanner::SetFile( std::string filename ) {
 	}
 	this->filename = filename;
 	file = std::fstream( filename, std::ios_base::in );
+	if( !file ) {
+		std::cerr << "Erro: Arquivo inexistente\n";
+		std::exit(EXIT_FAILURE);
+	}
 	GetNextLine();
 	currentLine = 1;
 	nextCh = 0;
