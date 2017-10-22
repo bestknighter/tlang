@@ -6,20 +6,24 @@
 
 class Scanner {
 	public:
-		Scanner& GetInstance();
+		static Scanner& GetInstance();
 		~Scanner();
 
-		void SetFile( string file );
-		int GetNextToken( string& nextToken );
+		void SetFile( std::string filename );
+		int GetNextToken( std::string& nextToken );
+		int GetCurrentLine();
+		std::string GetCurrentLineText();
 	private:
-		Scanner* instance;
+		static Scanner* instance;
 		Scanner();
 
-		string SearchNextToken();
+		std::string SearchNextToken();
+		void GetNextLine();
 
-		string filename;
+		std::string filename;
 		std::fstream file;
-		string line;
+		std::string line;
+		std::string currentLineText;
 		int currentLine;
 		char nextCh;
 };
