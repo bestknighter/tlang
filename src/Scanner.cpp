@@ -37,12 +37,13 @@ std::string Scanner::GetCurrentLineText() {
 	return currentLineText;
 }
 
-int Scanner::GetNextToken( std::string& nextToken ) {
+int Scanner::GetNextToken( Token& nextToken ) {
+	std::string token;
 	do {
-		nextToken = SearchNextToken();
-	} while( "" == nextToken && !file.eof());
+		token = SearchNextToken();
+	} while( "" == token && !file.eof());
 
-	// Validar token
+	nextToken = Token( token, currentLine, currentLineText.size() - (line.size() + token.size()) + (0 == line.size()) );
 
 	if( file.eof() && 0 == line.size() ) return -1;
 	return 0;

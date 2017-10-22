@@ -1,6 +1,8 @@
 #ifndef SCANNER_HPP
 #define SCANNER_HPP
 
+#include "Token.hpp"
+
 #include <string>
 #include <fstream>
 
@@ -10,7 +12,7 @@ class Scanner {
 		~Scanner();
 
 		void SetFile( std::string filename );
-		int GetNextToken( std::string& nextToken );
+		int GetNextToken( Token& nextToken );
 		int GetCurrentLine();
 		std::string GetCurrentLineText();
 	private:
