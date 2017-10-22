@@ -11,8 +11,6 @@ Scanner::Scanner()
 			, currentLine( 0 )
 			, nextCh( 0 ) {}
 
-Scanner::~Scanner() {}
-
 Scanner& Scanner::GetInstance() {
 	if( nullptr == instance ) {
 		instance = new Scanner();

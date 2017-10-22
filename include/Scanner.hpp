@@ -9,7 +9,6 @@
 class Scanner {
 	public:
 		static Scanner& GetInstance();
-		~Scanner();
 
 		void SetFile( std::string filename );
 		int GetNextToken( Token& nextToken );
