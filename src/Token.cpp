@@ -18,6 +18,7 @@ Token::Token( std::string text, int line, int column )
 	if( std::regex_match( tokenText, Label ) ) validAs |= Validity::LABEL;
 	if( std::regex_match( tokenText, Number ) ) validAs |= Validity::NUMBER;
 	if( std::regex_match( tokenText, Arithm ) ) validAs |= Validity::ARITHM;
+	if( ":" == tokenText || "," == tokenText ) validAs |= Validity::SPEC_C;
 }
 
 int Token::GetLine() {

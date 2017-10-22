@@ -43,9 +43,13 @@ std::string Scanner::GetCurrentLineText() {
 
 int Scanner::GetNextToken( Token& nextToken ) {
 	std::string token;
-	do {
-		token = SearchNextToken();
-	} while( "" == token && !file.eof());
+	if( ':' == nextCh || ',' == nextCh ) {
+		token = nextCh;
+	} else {
+		do {
+			token = SearchNextToken();
+		} while( "" == token && !file.eof());
+	}
 
 	nextToken = Token( token, currentLine, currentLineText.size() - (line.size() + token.size()) + (0 == line.size()) );
 
@@ -62,7 +66,7 @@ std::string Scanner::SearchNextToken() {
 	while( 0 < line.size() ) {
 		nextCh = line[0];
 		line.erase( 0, 1 );
-		if( ' ' == nextCh || ',' == nextCh || '\t' == nextCh || ';' == nextCh ) {
+		if( ' ' == nextCh || ',' == nextCh || '\t' == nextCh || ';' == nextCh || ':' nextCh ) {
 			break;
 		}
 		nextToken += std::toupper( nextCh );

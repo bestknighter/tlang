@@ -1,8 +1,7 @@
 #include "Instruction.hpp"
 
 Instruction::Instruction( int opcode, std::string mnemonic, int argc )
-				: label( "" )
-				, opcode( opcode )
+				: opcode( opcode )
 				, mnemonic( mnemonic )
 				, argc( argc )
 				, OPs( argc ) {}

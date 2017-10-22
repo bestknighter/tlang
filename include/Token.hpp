@@ -11,7 +11,8 @@ struct Token {
 		enum Validity {
 			LABEL = 1,
 			NUMBER = 1 << 1,
-			ARITHM = 1 << 2
+			ARITHM = 1 << 2,
+			SPEC_C = 1 << 3
 		};
 		int GetLine();
 		int GetColumn();

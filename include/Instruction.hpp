@@ -6,7 +6,6 @@
 
 struct Instruction {
 	public:
-		std::string label;
 		const int opcode;
 		const std::string mnemonic;
 		const argc;
