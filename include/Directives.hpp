@@ -7,7 +7,7 @@
 struct Directives {
 	public:
 		const std::string mnemonic;
-		const argc;
+		const int argc;
 		std::vector< int > OPs;
 		
 		static Directives SECTION();

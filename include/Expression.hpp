@@ -1,22 +1,24 @@
 #ifndef EXPRESSION_HPP
 #define EXPRESSION_HPP
 
-#include "Token.hpp"
-
-#include <vector>
 #include <array>
 
 struct Expression {
 	public:
-		Expression( std::vector< Token > args );
+		Expression();
+		Expression( bool isValid, std::string label, std::string operation, std::string operand1 = "", std::string operand2 = "", int offset1 = 0, int offset2 = 0 );
 
 		bool IsValid();
-		std::string to_string();
+		std::string GetLabel();
+		std::string GetOperation();
+		std::array< std::string, 2 > GetOperands();
+		std::array< int, 2 > GetOffsets();
 	private:
 		bool isValid;
-		Token label;
-		Token operation;
-		std::array< std::vector< Token >, 2 > OPs;
+		std::string label;
+		std::string operation;
+		std::array< std::string, 2 > operands;
+		std::array< int, 2 > offsets;
 };
 
 #endif // EXPRESSION_HPP

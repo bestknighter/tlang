@@ -8,7 +8,7 @@ struct Instruction {
 	public:
 		const int opcode;
 		const std::string mnemonic;
-		const argc;
+		const int argc;
 		std::vector< int > OPs;
 		
 		static Instruction ADD();

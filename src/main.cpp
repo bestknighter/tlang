@@ -2,8 +2,10 @@
 #include <string>
 #include <cstdlib>
 
+#include "Config.hpp"
 #include "Scanner.hpp"
-#include "Token.hpp"
+#include "Parser.hpp"
+#include "Expression.hpp"
 
 int main( int argc, char* argv[] ) {
 
@@ -13,22 +15,20 @@ int main( int argc, char* argv[] ) {
 	}
 	
 	// Pegando argumentos do programa
-	int numEtapas = 0;
-	std::string inputFile( argv[2] );
-	std::string outputFile( argv[3] );
-	std::string ext;
-
 	{
+		Config::inputFile = argv[2];
+		Config::outputFile = argv[3];
+
 		std::string arg = argv[1];
 		if( "-p" == arg ) {
-			numEtapas = 1;
-			ext = ".pre";
+			Config::numSteps = 1;
+			Config::ext = ".pre";
 		} else if( "-m" == arg ) {
-			numEtapas = 2;
-			ext = ".mcr";
+			Config::numSteps = 2;
+			Config::ext = ".mcr";
 		} else if( "-o" == arg ) {
-			numEtapas = 3;
-			ext = "";
+			Config::numSteps = 3;
+			Config::ext = "";
 		} else {
 			std::cerr << "Erro: Opcao " << arg << " nao reconhecido.\n";
 			return EXIT_FAILURE;
@@ -36,35 +36,14 @@ int main( int argc, char* argv[] ) {
 	}
 	// End Pegando argumentos do programa
 
-	Scanner& s = Scanner::GetInstance();
-	s.SetFile(inputFile);
+	Scanner::GetInstance().SetFile(Config::inputFile);
+	Parser& p = Parser::GetInstance();
 
-	Token t;
-	int code;
+	Expression e;
+	bool eof;
 	do {
-		code = s.GetNextToken(t);
-
-		// Verifica erros Lexicos
-		if( 0 == t.GetValidity() ) {
-			std::string errMsg = std::string( "Erro (Lexico) [bin.asm:" );
-			errMsg += std::to_string( t.GetLine() );
-			errMsg += ",";
-			errMsg += std::to_string( t.GetColumn() );
-			errMsg += std::string( "]: Token mal-formado\n    " );
-			errMsg += s.GetCurrentLineText();
-			errMsg += "\n    ";
-			for( unsigned int i = 0; i < s.GetCurrentLineText().size(); i++ ) {
-				char c = ' ';
-				if( t.GetColumn()-1 == int(i) ) c = '^';
-				else if( t.GetColumn()-1 < int(i) && t.GetText().size() + t.GetColumn()-1 > i ) c = '~';
-				errMsg += c;
-			}
-			errMsg += '\n';
-			std::cout << errMsg;
-		}
-		// End Verifica erros Lexicos
-
-	} while( code != -1 );
+		eof = p.GetNextExpression(e);
+	} while( !eof );
 
 	return 0;
 }

@@ -6,58 +6,58 @@ Instruction::Instruction( int opcode, std::string mnemonic, int argc )
 				, argc( argc )
 				, OPs( argc ) {}
 
-Intruction Intruction::ADD() {
+Instruction Instruction::ADD() {
 	return Instruction( 1, "ADD", 1 );
 }
 
-Intruction Intruction::SUB() {
+Instruction Instruction::SUB() {
 	return Instruction( 2, "SUB", 1 );
 }
 
-Intruction Intruction::MULT() {
+Instruction Instruction::MULT() {
 	return Instruction( 3, "MULT", 1 );
 }
 
-Intruction Intruction::DIV() {
+Instruction Instruction::DIV() {
 	return Instruction( 4, "DIV", 1 );
 }
 
-Intruction Intruction::JMP() {
+Instruction Instruction::JMP() {
 	return Instruction( 5, "JMP", 1 );
 }
 
-Intruction Intruction::JMPN() {
+Instruction Instruction::JMPN() {
 	return Instruction( 6, "JMPN", 1 );
 }
 
-Intruction Intruction::JMPP() {
+Instruction Instruction::JMPP() {
 	return Instruction( 7, "JMPP", 1 );
 }
 
-Intruction Intruction::JMPZ() {
+Instruction Instruction::JMPZ() {
 	return Instruction( 8, "JMPZ", 1 );
 }
 
-Intruction Intruction::COPY() {
+Instruction Instruction::COPY() {
 	return Instruction( 9, "COPY", 2 );
 }
 
-Intruction Intruction::LOAD() {
+Instruction Instruction::LOAD() {
 	return Instruction( 10, "LOAD", 1 );
 }
 
-Intruction Intruction::STORE() {
+Instruction Instruction::STORE() {
 	return Instruction( 11, "STORE", 1 );
 }
 
-Intruction Intruction::INPUT() {
+Instruction Instruction::INPUT() {
 	return Instruction( 12, "INPUT", 1 );
 }
 
-Intruction Intruction::OUTPUT() {
+Instruction Instruction::OUTPUT() {
 	return Instruction( 13, "OUTPUT", 1 );
 }
 
-Intruction Intruction::STOP() {
+Instruction Instruction::STOP() {
 	return Instruction( 14, "STOP", 0 );
 }

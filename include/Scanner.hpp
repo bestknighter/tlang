@@ -11,9 +11,10 @@ class Scanner {
 		static Scanner& GetInstance();
 
 		void SetFile( std::string filename );
-		int GetNextToken( Token& nextToken );
+		bool GetNextToken( Token& nextToken );
 		int GetCurrentLine();
 		std::string GetCurrentLineText();
+		std::string GetPreviousLineText();
 	private:
 		static Scanner* instance;
 		Scanner();
@@ -25,6 +26,7 @@ class Scanner {
 		std::fstream file;
 		std::string line;
 		std::string currentLineText;
+		std::string previousLineText;
 		int currentLine;
 		char nextCh;
 };
