@@ -136,6 +136,10 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 	return validCode;
 }
 
+bool Semantico::PassagemUnica( std::vector< Expression >& code ) {
+	
+}
+
 bool Semantico::LabelExists( std::string label ) {
 	bool exists = false;
 
