@@ -1,6 +1,7 @@
 #include "Scanner.hpp"
 
 #include "Config.hpp"
+#include "Error.hpp"
 
 #include <iostream>
 #include <cstdlib>
@@ -54,31 +55,14 @@ bool Scanner::GetNextToken( Token& nextToken ) {
 	} else {
 		do {
 			token = SearchNextToken();
-		} while( "" == token && !file.eof());
+		} while( token.size() == 0 && (!file.eof() || line.size() > 0));
 	}
 
 	nextToken = Token( token, currentLine, currentLineText.size() - (line.size() + token.size()) + (0 == line.size()) );
 
-	// Verifica erros Lexicos
-	if( 0 == nextToken.GetValidity() ) {
-		std::string errMsg = std::string( "Erro (Lexico) [" ) + Config::inputFile;
-		errMsg += ":";
-		errMsg += std::to_string( nextToken.GetLine() );
-		errMsg += ",";
-		errMsg += std::to_string( nextToken.GetColumn() );
-		errMsg += std::string( "]: Token mal-formado\n    " );
-		errMsg += currentLineText;
-		errMsg += "\n    ";
-		for( unsigned int i = 0; i < currentLineText.size(); i++ ) {
-			char c = ' ';
-			if( nextToken.GetColumn()-1 == int(i) ) c = '^';
-			else if( nextToken.GetColumn()-1 < int(i) && nextToken.GetText().size() + nextToken.GetColumn()-1 > i ) c = '~';
-			errMsg += c;
-		}
-		errMsg += '\n';
-		std::cout << errMsg;
+	if( !nextToken.GetValidity() ) {
+		Error::Lexico( "Token mal-formado.", nextToken );
 	}
-	// End Verifica erros Lexicos
 
 	if( file.eof() && 0 == line.size() ) return true;
 	return false;
