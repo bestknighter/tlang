@@ -59,6 +59,7 @@ bool Scanner::GetNextToken( Token& nextToken ) {
 	}
 
 	nextToken = Token( token, currentLine, currentLineText.size() - (line.size() + token.size()) + (0 == line.size()) );
+	if( token.size() == 0 ) return true;
 
 	if( !nextToken.GetValidity() ) {
 		Error::Lexico( "Token mal-formado.", nextToken );
