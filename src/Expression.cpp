@@ -39,8 +39,9 @@ Expression::operator std::string() {
 	if( 0 < label.size() ) {
 		inst += label + ": ";
 	}
-	inst += operation + " ";
+	inst += operation;
 	if( 0 < operands[0].size() ) {
+		inst += " ";
 		inst += operands[0];
 		if( 0 < offsets[0] ) {
 			inst += " + ";

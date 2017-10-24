@@ -138,6 +138,10 @@ bool Directives::Validate( Expression exp ) {
 			break;
 		}
 		case 7: { // END
+			if( 0 != exp.GetLabel().size() ) {
+				Error::Semantico( "Essa diretiva nao pode ser referenciada por label.", exp, 1, std::string( exp ).size() );
+				return false;
+			}
 			if( 0 < exp.GetOperands()[0].size() || 0 < exp.GetOperands()[1].size() ) {
 				int column = exp.GetLabel().size();
 				column += 2*(column>0) + 1;
@@ -145,12 +149,6 @@ bool Directives::Validate( Expression exp ) {
 				return false;
 			}
 			return true;
-			break;
-		}
-		default: {
-			int column = exp.GetLabel().size();
-			column += 2*(column>0) + 1;
-			Error::Semantico( "Instrucao nao reconhecida.", exp, column, column+exp.GetOperation().size()-1 );
 			break;
 		}
 	}

@@ -1,10 +1,13 @@
-#include <iostream>
-#include <string>
-#include <cstdlib>
-
 #include "Config.hpp"
 #include "Scanner.hpp"
-#include "Parser.hpp"
+#include "Semantico.hpp"
+#include "Expression.hpp"
+
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <cstdlib>
+#include <vector>
 
 int main( int argc, char* argv[] ) {
 
@@ -36,13 +39,25 @@ int main( int argc, char* argv[] ) {
 	// End Pegando argumentos do programa
 
 	Scanner::GetInstance().SetFile(Config::inputFile);
-	Parser& p = Parser::GetInstance();
+	Semantico& s = Semantico::GetInstance();
 
-	Expression e;
-	bool eof;
-	do {
-		eof = p.GetNextExpression(e);
-	} while( !eof );
+	std::vector< Expression > code;
+
+	// Passagem zero
+	if( s.PassagemZero( code ) ) {
+		std::fstream codeOutput = std::fstream( Config::outputFile + Config::ext, std::ios_base::out );
+		if( !codeOutput ) {
+			std::cerr << "Nao foi possivel abrir o arquivo para escrita\n";
+			return EXIT_FAILURE;
+		}
+		for( unsigned int i = 0; i < code.size(); i++ ) {
+			codeOutput << std::string( code[i] ) << "\n";
+		}
+		codeOutput.close();
+	} else {
+		std::cout << "Codigo possui erros. Arquivo nao gerado.\n";
+		return 0;
+	}
 
 	return 0;
 }

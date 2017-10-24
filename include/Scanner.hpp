@@ -8,6 +8,8 @@
 
 class Scanner {
 	public:
+		~Scanner();
+
 		static Scanner& GetInstance();
 
 		void SetFile( std::string filename );

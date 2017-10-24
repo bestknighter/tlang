@@ -12,6 +12,10 @@ Scanner::Scanner()
 			: filename( "" )
 			, currentLine( 0 )
 			, nextCh( 0 ) {}
+			
+Scanner::~Scanner() {
+	file.close();
+}
 
 Scanner& Scanner::GetInstance() {
 	if( nullptr == instance ) {
