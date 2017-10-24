@@ -82,8 +82,8 @@ debug: FLAGS += $(DBFLAGS)
 debug: $(EXEC)
 
 clean:
-	-@$(RM) "$(DEP_PATH)\*"
-	-@$(RM) "$(OBJ_PATH)\*"
+	-@$(RMDIR) "$(DEP_PATH)"
+	-@$(RMDIR) "$(OBJ_PATH)"
 	-@$(RM) $(EXEC)
 
 folders:
