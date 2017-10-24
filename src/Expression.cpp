@@ -34,6 +34,10 @@ std::array< int, 2 > Expression::GetOffsets() {
 	return offsets;
 }
 
+void Expression::ReplaceOperand( int whichOne, std::string substitute ) {
+	operands[whichOne] = substitute;
+}
+
 Expression::operator std::string() {
 	std::string inst = "";
 	if( 0 < label.size() ) {

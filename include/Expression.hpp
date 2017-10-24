@@ -14,6 +14,9 @@ struct Expression {
 		std::string GetOperation();
 		std::array< std::string, 2 > GetOperands();
 		std::array< int, 2 > GetOffsets();
+		
+		void ReplaceOperand( int whichOne, std::string substitute );
+
 		explicit operator std::string();
 	private:
 		unsigned int lineInSource;

@@ -43,7 +43,12 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 					break;
 				}
 				case 4: { // EQU
-					EQUs[e.GetLabel()] = std::stoi( e.GetOperands()[0] ) + e.GetOffsets()[0];
+					if( LabelExists( e.GetLabel() ) ) {
+						Error::Semantico( "Esta label ja foi previamente definida.", e, 1, e.GetLabel().size() );
+						validCode = false;
+					} else {
+						EQUs[e.GetLabel()] = std::stoi( e.GetOperands()[0] ) + e.GetOffsets()[0];
+					}
 					break;
 				}
 				case 5: { // IF
@@ -59,19 +64,24 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 					break;
 				}
 				case 6: { // MACRO
-					if( 2 <= Config::numSteps ) {
-						if( CurrentSection::TEXT != currentSection ) {
-							Error::Semantico( "Definicao de macro permitida somente na secao texto.", e, 1, std::string(e).size() );
-							validCode = false;
-						} else if( -1 == macroStart ) {
-							macroStart = preprocessedCode.size();
-							macroLabel = e.GetLabel();
-						} else {
-							Error::Semantico( "Proibida definicao de macro dentro de macro.", e, 1, std::string(e).size() );
-							validCode = false;
-						}
+					if( LabelExists( e.GetLabel() ) ) {
+						Error::Semantico( "Esta label ja foi previamente definida.", e, 1, e.GetLabel().size() );
+						validCode = false;
 					} else {
-						preprocessedCode.push_back(e);
+						if( 2 <= Config::numSteps ) {
+							if( CurrentSection::TEXT != currentSection ) {
+								Error::Semantico( "Definicao de macro permitida somente na secao texto.", e, 1, std::string(e).size() );
+								validCode = false;
+							} else if( -1 == macroStart ) {
+								macroStart = preprocessedCode.size();
+								macroLabel = e.GetLabel();
+							} else {
+								Error::Semantico( "Proibida definicao de macro dentro de macro.", e, 1, std::string(e).size() );
+								validCode = false;
+							}
+						} else {
+							preprocessedCode.push_back(e);
+						}
 					}
 					break;
 				}
@@ -97,7 +107,19 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 				}
 			}
 		} else if( Instruction::Validate( e ) ) {
-			// Falta substituir labels de EQU
+			// Substituindo EQUs
+			if( LabelExists( e.GetLabel() ) ) {
+				Error::Semantico( "Esta label ja foi previamente definida.", e, 1, e.GetLabel().size() );
+				validCode = false;
+			}
+			auto value = EQUs.find( e.GetOperands()[0] );
+			if( value != EQUs.end() ) {
+				e.ReplaceOperand( 0, std::to_string( value->second ) );
+			}
+			value = EQUs.find( e.GetOperands()[1] );
+			if( value != EQUs.end() ) {
+				e.ReplaceOperand( 1, std::to_string( value->second ) );
+			}
 			preprocessedCode.push_back( e );
 		} else {
 			try { // Expansao de macros
@@ -116,4 +138,25 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 
 	preproCode = preprocessedCode;
 	return validCode;
+}
+
+bool Semantico::LabelExists( std::string label ) {
+	bool exists = false;
+
+	{
+		auto value = EQUs.find( label );
+		exists |= (value != EQUs.end());
+	}
+
+	{
+		auto value = Macros.find( label );
+		exists |= (value != Macros.end());
+	}
+
+	{
+		auto value = Labels.find( label );
+		exists |= (value != Labels.end());
+	}
+
+	return exists;
 }

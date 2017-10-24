@@ -17,6 +17,7 @@ class Semantico {
 	private:
 		Semantico();
 		static Semantico* instance;
+		bool LabelExists( std::string label );
 
 		Parser& p;
 		enum CurrentSection {
@@ -27,6 +28,7 @@ class Semantico {
 		int macroStart;
 		std::map< std::string, int > EQUs;
 		std::map< std::string, std::tuple< unsigned int, unsigned int > > Macros;
+		std::map< std::string, unsigned int > Labels;
 };
 
 #endif // SEMANTICO_HPP
