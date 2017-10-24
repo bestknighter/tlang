@@ -68,37 +68,29 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 						Error::Semantico( "Esta label ja foi previamente definida.", e, 1, e.GetLabel().size() );
 						validCode = false;
 					} else {
-						if( 2 <= Config::numSteps ) {
-							if( CurrentSection::TEXT != currentSection ) {
-								Error::Semantico( "Definicao de macro permitida somente na secao texto.", e, 1, std::string(e).size() );
-								validCode = false;
-							} else if( -1 == macroStart ) {
-								macroStart = preprocessedCode.size();
-								macroLabel = e.GetLabel();
-							} else {
-								Error::Semantico( "Proibida definicao de macro dentro de macro.", e, 1, std::string(e).size() );
-								validCode = false;
-							}
+						if( CurrentSection::TEXT != currentSection ) {
+							Error::Semantico( "Definicao de macro permitida somente na secao texto.", e, 1, std::string(e).size() );
+							validCode = false;
+						} else if( -1 == macroStart ) {
+							macroStart = preprocessedCode.size();
+							macroLabel = e.GetLabel();
 						} else {
-							preprocessedCode.push_back(e);
+							Error::Semantico( "Proibida definicao de macro dentro de macro.", e, 1, std::string(e).size() );
+							validCode = false;
 						}
 					}
 					break;
 				}
 				case 7: { // END
-					if( 2 <= Config::numSteps ) {
-						if( CurrentSection::TEXT != currentSection ) {
-							Error::Semantico( "Definicao de macro permitida somente na secao texto.", e, 1, std::string(e).size() );
-							validCode = false;
-						} else if( -1 == macroStart ) {
-							Error::Semantico( "Macro nao estava sendo definida ao se encontrar END.", e, 1, std::string(e).size() );
-							validCode = false;
-						} else {
-							Macros[macroLabel] = std::make_tuple( macroStart, preprocessedCode.size() );
-							macroStart = -1;
-						}
+					if( CurrentSection::TEXT != currentSection ) {
+						Error::Semantico( "Definicao de macro permitida somente na secao texto.", e, 1, std::string(e).size() );
+						validCode = false;
+					} else if( -1 == macroStart ) {
+						Error::Semantico( "Macro nao estava sendo definida ao se encontrar END.", e, 1, std::string(e).size() );
+						validCode = false;
 					} else {
-						preprocessedCode.push_back(e);
+						Macros[macroLabel] = std::make_tuple( macroStart, preprocessedCode.size() );
+						macroStart = -1;
 					}
 					break;
 				}
@@ -122,16 +114,20 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 			}
 			preprocessedCode.push_back( e );
 		} else {
-			try { // Expansao de macros
-				auto bounds = Macros.at( e.GetOperation() );
-				for( unsigned int i = std::get<0>(bounds); i < std::get<1>(bounds); i++ ) {
-					preprocessedCode.push_back( preprocessedCode[i] );
+			if( 2 <= Config::numSteps ) {
+				try { // Expansao de macros
+					auto bounds = Macros.at( e.GetOperation() );
+					for( unsigned int i = std::get<0>(bounds); i < std::get<1>(bounds); i++ ) {
+						preprocessedCode.push_back( preprocessedCode[i] );
+					}
+				} catch( std::out_of_range &err ) {
+					int column = e.GetLabel().size();
+					column += 2*(column>0) + 1;
+					Error::Semantico( "Instrucao, diretiva ou macro nao reconhecida.", e, column, column+e.GetOperation().size()-1 );
+					validCode = false;
 				}
-			} catch( std::out_of_range &err ) {
-				int column = e.GetLabel().size();
-				column += 2*(column>0) + 1;
-				Error::Semantico( "Instrucao, diretiva ou macro nao reconhecida.", e, column, column+e.GetOperation().size()-1 );
-				validCode = false;
+			} else {
+				preprocessedCode.push_back( e );
 			}
 		}
 	} while( !eof );
