@@ -1,24 +1,17 @@
 #ifndef DIRECTIVES_HPP
 #define DIRECTIVES_HPP
 
+#include "Expression.hpp"
+
 #include <string>
-#include <vector>
+#include <map>
 
 struct Directives {
 	public:
-		const std::string mnemonic;
-		const int argc;
-		std::vector< int > OPs;
-		
-		static Directives SECTION();
-		static Directives SPACE();
-		static Directives CONST();
-		static Directives EQU();
-		static Directives IF();
-		static Directives MACRO();
-		static Directives END();
+		static bool Validate( Expression exp );
+		static int GetCode( std::string key );
 	private:
-		Directives( std::string mnemonic, int argc);
+		const static std::map< std::string, int > mnemToCode;
 };
 
 #endif // INSTRUCTION_HPP

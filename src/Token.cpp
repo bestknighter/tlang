@@ -1,8 +1,8 @@
 #include "Token.hpp"
 
-std::regex Token::Label = std::regex( "^[A-Z_]+[A-Z0-9_]*:?$", std::regex_constants::ECMAScript | std::regex_constants::optimize );
-std::regex Token::Number = std::regex( "^[+-]?(?:0X)?[0-9]+$", std::regex_constants::ECMAScript | std::regex_constants::optimize );
-std::regex Token::Arithm = std::regex( "^[+-]$", std::regex_constants::ECMAScript | std::regex_constants::optimize );
+const std::regex Token::Label = std::regex( "^[A-Z_]+[A-Z0-9_]*:?$", std::regex_constants::ECMAScript | std::regex_constants::optimize );
+const std::regex Token::Number = std::regex( "^[+-]?(?:0X)?[0-9]+$", std::regex_constants::ECMAScript | std::regex_constants::optimize );
+const std::regex Token::Arithm = std::regex( "^[+-]$", std::regex_constants::ECMAScript | std::regex_constants::optimize );
 
 Token::Token()
 		: tokenText( "" )

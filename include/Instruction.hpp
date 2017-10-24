@@ -1,32 +1,20 @@
 #ifndef INSTRUCTION_HPP
 #define INSTRUCTION_HPP
 
+#include "Expression.hpp"
+
 #include <string>
-#include <vector>
+#include <map>
 
 struct Instruction {
 	public:
-		const int opcode;
-		const std::string mnemonic;
-		const int argc;
-		std::vector< int > OPs;
-		
-		static Instruction ADD();
-		static Instruction SUB();
-		static Instruction MULT();
-		static Instruction DIV();
-		static Instruction JMP();
-		static Instruction JMPN();
-		static Instruction JMPP();
-		static Instruction JMPZ();
-		static Instruction COPY();
-		static Instruction LOAD();
-		static Instruction STORE();
-		static Instruction INPUT();
-		static Instruction OUTPUT();
-		static Instruction STOP();
+		static bool Validate( Expression exp );
+		static int GetOpcode( std::string key );
 	private:
-		Instruction(int opcode, std::string mnemonic, int argc);
+		const static std::map< std::string, unsigned int > mnemToOpcode;
+		static bool ValidateNoArg( Expression exp );
+		static bool ValidateSingleArg( Expression exp );
+		static bool ValidateTwoArg( Expression exp );
 };
 
 #endif // INSTRUCTION_HPP

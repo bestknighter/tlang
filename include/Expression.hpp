@@ -6,14 +6,17 @@
 struct Expression {
 	public:
 		Expression();
-		Expression( bool isValid, std::string label, std::string operation, std::string operand1 = "", std::string operand2 = "", int offset1 = 0, int offset2 = 0 );
+		Expression( bool isValid, unsigned int lineInSource, std::string label, std::string operation, std::string operand1 = "", std::string operand2 = "", int offset1 = 0, int offset2 = 0 );
 
 		bool IsValid();
+		unsigned int GetLineInSource();
 		std::string GetLabel();
 		std::string GetOperation();
 		std::array< std::string, 2 > GetOperands();
 		std::array< int, 2 > GetOffsets();
+		explicit operator std::string();
 	private:
+		unsigned int lineInSource;
 		bool isValid;
 		std::string label;
 		std::string operation;

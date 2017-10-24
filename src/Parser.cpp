@@ -51,31 +51,31 @@ bool Parser::GetNextExpression( Expression& exp ) {
 Expression Parser::CreateExpression( std::vector< Token > tokens ) {
 	if( tokens.size() == 1 ) { // Operacao sem argumento
 		if( tokens[0].GetValidity() & Token::Validity::LABEL ) { // Operacao Válida
-			return Expression( true, "", tokens[0].GetText() );
+			return Expression( true, tokens[0].GetLine(), "", tokens[0].GetText() );
 		} else if ( tokens[0].GetValidity() ) { // Queria do tipo label mas obteve de outro tipo
 			Error::Sintatico( "Token inesperado. Esperava-se um token do tipo label.", tokens[0] );
-			return Expression( false, "", tokens[0].GetText() );
+			return Expression( false, tokens[0].GetLine(), "", tokens[0].GetText() );
 		}
 	} else if ( tokens.size() == 2 ) { // Pode ser Label vazio ou operacao com um operando
 		if( ":" == tokens[1].GetText() ) { // Label vazio
 			if( tokens[0].GetValidity() & Token::Validity::LABEL ) { // Token precisa ser label
-				return Expression(true, tokens[0].GetText(), "");
+				return Expression(true, tokens[0].GetLine(), tokens[0].GetText(), "");
 			} else if ( tokens[0].GetValidity() ) {
 				Error::Sintatico( "Token inesperado. Esperava-se um token do tipo label.", tokens[0] );
-				return Expression( false, tokens[0].GetText(), "" );
+				return Expression( false, tokens[0].GetLine(), tokens[0].GetText(), "" );
 			}
 		} else { // Operacao com um operando
 			if( tokens[0].GetValidity() & Token::Validity::LABEL ) {
 				if( tokens[1].GetValidity() & (Token::Validity::LABEL | Token::Validity::NUMBER) ) {
 					// Tem quer ser: LABEL LABEL/NUM
-					return Expression( true, "", tokens[0].GetText(), tokens[1].GetText() );
+					return Expression( true, tokens[0].GetLine(), "", tokens[0].GetText(), tokens[1].GetText() );
 				} else if ( tokens[1].GetValidity() ) {
 					Error::Sintatico( "Token inesperado. Esperava-se um token do tipo label ou numero.", tokens[1] );
 				}
 			} else if( tokens[0].GetValidity() ) {
 				Error::Sintatico( "Token inesperado. Esperava-se um token do tipo label.", tokens[0] );
 			}
-			return Expression( false, "", tokens[0].GetText(), tokens[1].GetText() );
+			return Expression( false, tokens[0].GetLine(), "", tokens[0].GetText(), tokens[1].GetText() );
 		}
 	} else {
 		std::string label;
@@ -128,7 +128,7 @@ Expression Parser::CreateExpression( std::vector< Token > tokens ) {
 				valid = false;
 			}
 		}
-		return Expression( valid, label, operation, operands[0], operands[1], offsets[0], offsets[1] );
+		return Expression( valid, tokens[0].GetLine(), label, operation, operands[0], operands[1], offsets[0], offsets[1] );
 	}
-	return Expression( false, "", "" );
+	return Expression( false, tokens[0].GetLine(), "", "" );
 }

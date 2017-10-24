@@ -15,25 +15,8 @@ void Error::Sintatico( std::string errorMsg, Token t ) {
 	PrintError( "Sintatico", errorMsg, t.GetLine(), t.GetColumn(), fullLine, t.GetColumn(), t.GetColumn()-1 + t.GetText().size() );
 }
 
-void Error::Semantico() {
-	/*
-	std::string errMsg = std::string( "Erro (Sintatico) [" ) + Config::inputFile;
-	errMsg += ":";
-	errMsg += std::to_string( tokens[0].GetLine() );
-	errMsg += ",";
-	errMsg += std::to_string( tokens[0].GetColumn() );
-	errMsg += std::string( "]: Token inesperado. Esperava-se um token do tipo label.\n    " );
-	errMsg += s.GetPreviousLineText();
-	errMsg += "\n    ";
-	for( unsigned int i = 0; i < s.GetPreviousLineText().size(); i++ ) {
-		char c = ' ';
-		if( tokens[0].GetColumn()-1 == int(i) ) c = '^';
-		else if( tokens[0].GetColumn()-1 < int(i) && tokens[0].GetText().size() + tokens[0].GetColumn()-1 > i ) c = '~';
-		errMsg += c;
-	}
-	errMsg += '\n';
-	std::cout << errMsg;
-	*/
+void Error::Semantico( std::string errorMsg, Expression exp, unsigned int highlightStart, unsigned int highlightEnd ) {
+	PrintError( "Semantico", errorMsg, exp.GetLineInSource(), highlightStart, std::string(exp), highlightStart, highlightEnd );
 }
 
 void Error::PrintError( std::string type, std::string errorMsg, unsigned int line, unsigned int column, std::string lineOfCode, unsigned int highlightStart, unsigned int highlightEnd ) {

@@ -18,14 +18,14 @@ struct Token {
 		int GetColumn();
 		int GetValidity();
 		std::string GetText();
+		const static std::regex Label;
+		const static std::regex Number;
+		const static std::regex Arithm;
 	private:
 		std::string tokenText;
 		int line;
 		int column;
 		int validAs;
-		static std::regex Label;
-		static std::regex Number;
-		static std::regex Arithm;
 };
 
 #endif // TOKEN_HPP
