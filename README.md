@@ -1,5 +1,5 @@
 # tlang
-tlang is a macro assembler from a toy assembly to a toy ISA
+[tlang](https://github.com/bestknighter/tlang) is a macro assembler from a toy assembly to a toy ISA
 
 Developed for Windows 10 x64 but with Linux compatiblity (not tested) in mind.
 
