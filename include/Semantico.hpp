@@ -14,6 +14,7 @@ class Semantico {
 		static Semantico& GetInstance();
 
 		bool PassagemZero( std::vector< Expression >& preproCode);
+		bool PassagemUnica( std::vector< Expression >& code );
 	private:
 		Semantico();
 		static Semantico* instance;
