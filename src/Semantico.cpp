@@ -1,5 +1,8 @@
 #include "Semantico.hpp"
 
+#include "Directives.hpp"
+#include "Instructions.hpp"
+
 Semantico* Semantico::instance = nullptr;
 
 Semantico::Semantico() : p( Parser::GetInstance() ) {}
@@ -11,8 +14,20 @@ Semantico& Semantico::GetInstance() {
 	return *instance;
 }
 
-bool Semantico::GetNextExpression(Expression& exp) {
-	bool eof = p.GetNextExpression(exp);
+std::vector< Expression > PassagemZero() {
+	std::vector< Expression > preprocessedCode;
 
-	// Procurar erros semanticos
+	Expression e;
+	bool eof;
+	bool validCode = true;
+	do {
+		eof = p.GetNextExpression(e);
+		if( Directives::Validate( e ) ) {
+			// Executar diretiva
+		} else if( Instruction::Validate( e ) ) {
+			preprocessedCode.push_back( e );
+		} else {
+			validCode = false;
+		}
+	} while( !eof );
 }

@@ -4,11 +4,13 @@
 #include "Parser.hpp"
 #include "Expression.hpp"
 
+#include <vector>
+
 class Semantico {
 	public:
 		static Semantico& GetInstance();
 
-		bool GetNextExpression(Expression &exp);
+		std::vector< Expression > PassagemZero();
 	private:
 		Semantico();
 		static Semantico* instance;
