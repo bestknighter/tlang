@@ -331,7 +331,8 @@ std::string Semantico::PassagemUnica( std::vector< Expression >& code ) {
 					code[i].ReplaceOperand(0, std::to_string( std::get<0>( value ) ) );
 				}
 			}
-			int bin = std::stoi( code[i].GetOperands()[0] ) + code[i].GetOffsets()[0]; // Nao se poe os offsets aqui
+			offsets.push_back( {finalCode.size(), code[i].GetOffsets()[0]} );
+			int bin = std::stoi( code[i].GetOperands()[0] );
 			if( 4 == opCode && 0 == bin ) {
 				Error::Semantico( "Divisao por zero.", code[i], 1, std::string( code[i] ).size() );
 				std::exit(EXIT_FAILURE);
@@ -353,9 +354,14 @@ std::string Semantico::PassagemUnica( std::vector< Expression >& code ) {
 					code[i].ReplaceOperand(1, std::to_string( std::get<0>( value ) ) );
 				}
 			}
-			finalCode.push_back( std::stoi( code[i].GetOperands()[1] ) + code[i].GetOffsets()[1] );
+			offsets.push_back( {finalCode.size(), code[i].GetOffsets()[1]} );
+			finalCode.push_back( std::stoi( code[i].GetOperands()[1] ) );
 		}
 
+	}
+
+	for( unsigned int i = 0; i < offsets.size(); i++ ) {
+		finalCode[std::get<0>(offsets[i])] += std::get<1>(offsets[i]);
 	}
 
 	std::string binary = std::to_string( finalCode[0] );

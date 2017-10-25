@@ -32,6 +32,7 @@ class Semantico {
 		std::map< std::string, std::tuple< unsigned int, unsigned int > > Macros;
 		std::map< std::string, bool > dataLabels; // Temp pra deteccao de erros na primeira passagem
 		std::map< std::string, bool > textLabels; // Temp pra deteccao de erros na primeira passagem (bool é dummy)
+		std::vector< std::tuple< int, int > > offsets; // Temp para fazer offsets corretamente
 		std::map< std::string, std::tuple< unsigned int, bool, bool, int > > Symbols; // Endereco, definido, const, lista
 };
 
