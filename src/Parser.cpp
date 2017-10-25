@@ -3,10 +3,10 @@
 #include "Config.hpp"
 #include "Error.hpp"
 
-#include <iostream>
 #include <algorithm>
-#include <iterator>
 #include <array>
+#include <iostream>
+#include <iterator>
 
 Parser* Parser::instance = nullptr;
 
@@ -33,7 +33,7 @@ bool Parser::GetNextExpression( Expression& exp ) {
 	if( nextToken->GetLine() == lineBeingProcessed ) {
 		tokens.push_back( *nextToken );
 	}
-	do {
+	do { // Obtem todos os tokens da mesma inha
 		eof = s.GetNextToken( *nextToken );
 		if( nextToken->GetLine() == lineBeingProcessed ) {
 			tokens.push_back( *nextToken );
@@ -45,16 +45,16 @@ bool Parser::GetNextExpression( Expression& exp ) {
 	lineBeingProcessed = nextToken->GetLine();
 
 	exp = CreateExpression( tokens );
-	if( 0 < exp.GetLabel().size() && 0 == exp.GetOperation().size() ) { // Label sozinho
-		Expression exp2;
+	if( 0 < exp.GetLabel().size() && 0 == exp.GetOperation().size() ) { // Caso seja só um label sozinho
+		Expression exp2; // Obtenha a próxima linha
 		eof = GetNextExpression( exp2 );
-		if( 0 == exp2.GetLabel().size() ) { // Proxima linha nao tem label
+		if( 0 == exp2.GetLabel().size() ) { // Caso a proxima linha nao tenha label
 			exp = Expression( exp.IsValid() && exp2.IsValid()
 							, exp2.GetLineInSource(), exp.GetLabel()
 							, exp2.GetOperation(), exp2.GetOperands()[0]
 							, exp2.GetOperands()[1], exp2.GetOffsets()[0]
 							, exp2.GetOffsets()[1] );
-		} else {
+		} else { // Caso tenha, significa duas labels para a mesma linha de código
 			Error::Sintatico( "Proibido declaracao de duas labels por linha de codigo.", tokens[0] );
 		}
 	}
@@ -90,7 +90,7 @@ Expression Parser::CreateExpression( std::vector< Token > tokens ) {
 			}
 			return Expression( false, tokens[0].GetLine(), "", tokens[0].GetText(), tokens[1].GetText() );
 		}
-	} else {
+	} else { // Várias combinações possíveis
 		std::string label;
 		std::string operation;
 		bool valid = true;
@@ -109,14 +109,14 @@ Expression Parser::CreateExpression( std::vector< Token > tokens ) {
 				valid = false;
 			}
 		}
-		operation = tokens[i].GetText(); // Detectar erros disso
+		operation = tokens[i].GetText();
 		for( i++ ; i < tokens.size(); i++ ) {
-			if( ":" == tokens[i].GetText() ) { // Opa! Labels ja deveriam ter sido tratados. Isso significa que o label esta num local incorreto
+			if( ":" == tokens[i].GetText() ) { // Opa! Labels ja deveriam ter sido tratados. Isso significa que o label está num local incorreto
 				Error::Sintatico( "Declaracao de label em local nao esperado!\nDeclaracao de labels, quando usados, devem ser a primeira instrucao na linha.\nIsso pode ser tambem pela declaracao proibida de mais de uma label por instrucao.", tokens[i-1] );
 				valid = false;
 				break;
 			}
-			if( "," == tokens[i].GetText() ) {
+			if( "," == tokens[i].GetText() ) { // Passando para segundo argumento
 				opn++;
 				continue;
 			}
@@ -126,13 +126,13 @@ Expression Parser::CreateExpression( std::vector< Token > tokens ) {
 				} else {
 					opn++;
 					operands[opn] = tokens[i].GetText();
-					Error::Sintatico( "Caracter ',' esperado antes desse token.", tokens[i] );
+					Error::Sintatico( "Caracter ',' esperado antes desse token.", tokens[i] ); // Seria mais um warning, pois nesse caso podemos consertar
 					valid = false;
 				}
 			} else if( i+1 < tokens.size() && (tokens[i].GetValidity() & Token::Validity::ARITHM) && (tokens[i+1].GetValidity() & Token::Validity::NUMBER) ) {
 				offsets[opn] = ("+" == tokens[i].GetText() ? 1 : -1) * std::stoi( tokens[i+1].GetText(), 0, 0 );
 				if( operands[opn].size() == 0 && 0 != offsets[opn] ) {
-					Error::Sintatico( "Inserido offset mas sem label.", tokens[i] );
+					Error::Sintatico( "Inserido offset mas sem ter um label.", tokens[i] );
 					valid = false;
 				}
 				i++;
@@ -141,7 +141,7 @@ Expression Parser::CreateExpression( std::vector< Token > tokens ) {
 				valid = false;
 			}
 		}
-		return Expression( valid, tokens[0].GetLine(), label, operation, operands[0], operands[1], offsets[0], offsets[1] );
+		return Expression( valid, tokens[0].GetLine(), label, operation, operands[0], operands[1], offsets[0], offsets[1] ); // Expressão obtida
 	}
-	return Expression( false, tokens[0].GetLine(), "", "" );
+	return Expression( false, tokens[0].GetLine(), "", "" ); // Valor simbólico para expressão vazia
 }

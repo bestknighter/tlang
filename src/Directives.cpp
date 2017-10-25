@@ -3,8 +3,8 @@
 #include "Error.hpp"
 #include "Token.hpp"
 
-#include <stdexcept>
 #include <regex>
+#include <stdexcept>
 
 const std::map< std::string, int > Directives::mnemToCode = { {"SECTION", 1}, {"SPACE", 2}
 															, {"CONST", 3}, {"EQU", 4}

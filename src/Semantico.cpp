@@ -2,12 +2,12 @@
 
 #include "Config.hpp"
 #include "Directives.hpp"
-#include "Instruction.hpp"
 #include "Error.hpp"
+#include "Instruction.hpp"
 
-#include <stdexcept>
 #include <cstdlib>
 #include <iostream>
+#include <stdexcept>
 
 Semantico* Semantico::instance = nullptr;
 
@@ -25,6 +25,7 @@ Semantico& Semantico::GetInstance() {
 
 bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 	std::array< std::vector< Expression >, 2 > preprocessedCode; // 0 = TEXT, 1 = DATA
+	// Para facilitar colocar a seção DATA no final do código objeto
 	
 	std::string macroLabel;
 	Expression e;
@@ -50,6 +51,7 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 						Error::Semantico( "Esta label ja foi previamente definida.", e, 1, e.GetLabel().size() );
 						validCode = false;
 					}
+					// Anotando a existência dessa label
 					if( !LabelExists( e.GetLabel(), dataLabels ) ) {
 						dataLabels[e.GetLabel()] = false;
 					}
@@ -57,7 +59,7 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 						Error::Semantico( "Essa diretiva somente e valida na secao data.", e, 1, std::string( e ).size() );
 						validCode = false;
 					}
-					if( CurrentSection::NONE != currentSection ){
+					if( CurrentSection::NONE != currentSection ) { // Não lança erro pois isso é feito em outro ponto já
 						preprocessedCode[currentSection].push_back( e );
 					}
 					break;
@@ -67,6 +69,7 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 						Error::Semantico( "Esta label ja foi previamente definida.", e, 1, e.GetLabel().size() );
 						validCode = false;
 					}
+					// Anotando a existência dessa label
 					if( !LabelExists( e.GetLabel(), dataLabels ) ) {
 						dataLabels[e.GetLabel()] = true;
 					}
@@ -74,7 +77,7 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 						Error::Semantico( "Essa diretiva somente e valida na secao data.", e, 1, std::string( e ).size() );
 						validCode = false;
 					}
-					if( CurrentSection::NONE != currentSection ){
+					if( CurrentSection::NONE != currentSection ){ // Não lança erro pois isso é feito em outro ponto já
 						preprocessedCode[currentSection].push_back( e );
 					}
 					break;
@@ -108,7 +111,7 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 						if( CurrentSection::TEXT != currentSection ) {
 							Error::Semantico( "Definicao de macro permitida somente na secao texto.", e, 1, std::string(e).size() );
 							validCode = false;
-						} else if( -1 == macroStart ) {
+						} else if( -1 == macroStart ) { // Armazena quando a macro começa
 							macroStart = preprocessedCode.size();
 							macroLabel = e.GetLabel();
 						} else {
@@ -130,6 +133,7 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 						Error::Semantico( "Macro nao estava sendo definida ao se encontrar END.", e, 1, std::string(e).size() );
 						validCode = false;
 					} else {
+						// Salva a macro e prepara para poder receber outras
 						Macros[macroLabel] = std::make_tuple( macroStart, preprocessedCode.size() );
 						macroStart = -1;
 					}
@@ -139,7 +143,7 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 					}
 					break;
 				}
-				default: {
+				default: { // Diretiva que só se executa na passagem única
 					preprocessedCode[currentSection].push_back(e);
 				}
 			}
@@ -153,9 +157,11 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 				Error::Semantico( "Esta label ja foi previamente definida.", e, 1, e.GetLabel().size() );
 				validCode = false;
 			}
+			// Anotando a existência dessa label
 			if( 0 < e.GetLabel().size() && !LabelExists( e.GetLabel(), textLabels ) ) {
 				textLabels[e.GetLabel()] = false;
 			}
+			// Substituição em si
 			auto value = EQUs.find( e.GetOperands()[0] );
 			if( value != EQUs.end() ) {
 				e.ReplaceOperand( 0, std::to_string( value->second ) );
@@ -195,8 +201,8 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 	if( 1 >= preprocessedCode[0].size() ) {
 		Error::PrintError( "Semantico", "Secao TEXT ausente ou vazia." );
 	}
-	preproCode = preprocessedCode[0];
-	for( unsigned int i = 0; i < preprocessedCode[1].size(); i++ ) {
+	preproCode = preprocessedCode[0]; // Salva seção TEXT primeiro
+	for( unsigned int i = 0; i < preprocessedCode[1].size(); i++ ) { // E seção DATA segundo
 		preproCode.push_back( preprocessedCode[1][i] );
 	}
 
@@ -236,7 +242,7 @@ std::string Semantico::PassagemUnica( std::vector< Expression >& code ) {
 					}
 				}
 				// Insere os 0
-				unsigned int amount = 0 == code[i].GetOperands()[0].size() ? 1 : std::stoi( code[i].GetOperands()[0] );
+				unsigned int amount = 0 == code[i].GetOperands()[0].size() ? 1 : std::stoi( code[i].GetOperands()[0] ) + code[i].GetOffsets()[0] ;
 				for(unsigned int i = 0; i < amount ; i++ ) {
 					finalCode.push_back( 0 );
 				}
@@ -260,14 +266,14 @@ std::string Semantico::PassagemUnica( std::vector< Expression >& code ) {
 						validCode = false;
 					}
 				}
-				// Insere os valor
+				// Insere o valor
 				finalCode.push_back( std::stoi( code[i].GetOperands()[0] ) + code[i].GetOffsets()[0] );
 				continue;
 			}
 		}
 
 		if( 0 < code[i].GetLabel().size() ) { // Tem label
-			if( !LabelExists( code[i].GetLabel(), Symbols ) ) { // Label nao foi declarado e define
+			if( !LabelExists( code[i].GetLabel(), Symbols ) ) { // Label nao foi declarado e definido
 				Symbols[code[i].GetLabel()] = {finalCode.size(), true, true, -1};
 			} else { // Label foi declarado
 				auto value = Symbols[code[i].GetLabel()];
@@ -339,7 +345,9 @@ std::string Semantico::PassagemUnica( std::vector< Expression >& code ) {
 					code[i].ReplaceOperand(0, std::to_string( std::get<0>( value ) ) );
 				}
 			}
+			// Adiciona os offsets para serem computados ao final
 			offsets.push_back( {finalCode.size(), code[i].GetOffsets()[0]} );
+
 			int bin = std::stoi( code[i].GetOperands()[0] );
 			if( 4 == opCode && 0 == bin ) {
 				Error::Semantico( "Divisao por zero.", code[i], 1, std::string( code[i] ).size() );
@@ -362,6 +370,7 @@ std::string Semantico::PassagemUnica( std::vector< Expression >& code ) {
 					code[i].ReplaceOperand(1, std::to_string( std::get<0>( value ) ) );
 				}
 			}
+			// Adiciona os offsets para serem computados ao final
 			offsets.push_back( {finalCode.size(), code[i].GetOffsets()[1]} );
 			finalCode.push_back( std::stoi( code[i].GetOperands()[1] ) );
 		}
@@ -376,10 +385,12 @@ std::string Semantico::PassagemUnica( std::vector< Expression >& code ) {
 	}
 	
 	if( validCode ) {
+		// Se o código é válido, aplique os offsets
 		for( unsigned int i = 0; i < offsets.size(); i++ ) {
 			finalCode[std::get<0>(offsets[i])] += std::get<1>(offsets[i]);
 		}
 	
+		// E gere a string
 		std::string binary = std::to_string( finalCode[0] );
 		for(unsigned int i = 1; i < finalCode.size(); i++ ) {
 			binary += " ";
@@ -388,7 +399,7 @@ std::string Semantico::PassagemUnica( std::vector< Expression >& code ) {
 	
 		return binary;
 	} else {
-		std::cout << "Codigo invalido. Codigo final nao gerado.\n";
+		std::cout << "Codigo invalido. Codigo objeto nao gerado.\n";
 		std::exit( EXIT_FAILURE );
 	}
 

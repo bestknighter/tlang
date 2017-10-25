@@ -1,12 +1,16 @@
 #ifndef ERROR_H
 #define ERROR_H
 
-#include "Token.hpp"
 #include "Expression.hpp"
+#include "Token.hpp"
 
 #include <string>
 
-class Error {
+/**
+ * Struct Error
+ * Estrutura de suporte para se modularizar a formatação das mensagens de erro.
+ */
+struct Error {
 	public:
 		static void Lexico( std::string errorMsg, Token t );
 		static void Sintatico( std::string errorMsg, Token t );

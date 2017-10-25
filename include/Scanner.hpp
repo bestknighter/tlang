@@ -6,17 +6,22 @@
 #include <string>
 #include <fstream>
 
+/**
+ * Class Singleton Scanner
+ * É a classe que interfaceia com o arquivo, obtendo caracter a caracter com
+ * o objetivo de se extrair os tokens.
+ */
 class Scanner {
 	public:
 		~Scanner();
 
 		static Scanner& GetInstance();
 
-		void SetFile( std::string filename );
+		void SetFile( std::string filename ); // Recomeça o processo para o arquivo passado.
 		bool GetNextToken( Token& nextToken );
-		int GetCurrentLine();
-		std::string GetCurrentLineText();
-		std::string GetPreviousLineText();
+		int GetCurrentLine(); // Obtem a linha que está sendo processada no momento
+		std::string GetCurrentLineText(); // Obtem o texto da linha atual
+		std::string GetPreviousLineText(); // Obtem o texto da linha anterior
 	private:
 		static Scanner* instance;
 		Scanner();

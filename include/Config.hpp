@@ -3,6 +3,11 @@
 
 #include <string>
 
+/**
+ * Struct Config
+ * Estrutura para armazenar de forma a se ter fácil aceso por todo
+ * o código das configuraçãoes setadas por linha de comando.
+ */
 struct Config {
 	public:
 		static std::string inputFile;

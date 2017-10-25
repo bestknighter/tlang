@@ -3,17 +3,21 @@
 
 #include "Expression.hpp"
 
-#include <string>
 #include <map>
+#include <string>
 #include <tuple>
 
+/**
+ * Struct Instruction
+ * Serve para facilitar a validação e obtenção dos valores dos opcodes de cada instrução
+ */
 struct Instruction {
 	public:
 		static bool Validate( Expression exp );
 		static int GetOpcode( std::string key );
 		static int GetOpsize( std::string key );
-	private:
-		const static std::map< std::string, std::tuple< unsigned int, unsigned int > > instMap; // Opcode, tamanho
+	private:										//	Opcode		, tamanho
+		const static std::map< std::string, std::tuple< unsigned int, unsigned int > > instMap;
 		static bool ValidateNoArg( Expression exp );
 		static bool ValidateSingleArg( Expression exp );
 		static bool ValidateTwoArg( Expression exp );

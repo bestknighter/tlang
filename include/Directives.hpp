@@ -3,9 +3,13 @@
 
 #include "Expression.hpp"
 
-#include <string>
 #include <map>
+#include <string>
 
+/**
+ * Struct Directives
+ * Estrutura para auxílio na hora de validar e executar as diretivas. Similar a Struct Instruction mas para diretivas.
+ */
 struct Directives {
 	public:
 		static bool Validate( Expression exp );
