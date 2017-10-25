@@ -7,6 +7,7 @@
 
 #include <stdexcept>
 #include <cstdlib>
+#include <iostream>
 
 Semantico* Semantico::instance = nullptr;
 
@@ -191,6 +192,9 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 		}
 	} while( !eof );
 
+	if( 1 >= preprocessedCode[0].size() ) {
+		Error::PrintError( "Semantico", "Secao TEXT ausente ou vazia." );
+	}
 	preproCode = preprocessedCode[0];
 	for( unsigned int i = 0; i < preprocessedCode[1].size(); i++ ) {
 		preproCode.push_back( preprocessedCode[1][i] );
@@ -202,6 +206,7 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 std::string Semantico::PassagemUnica( std::vector< Expression >& code ) {
 	std::vector< int > finalCode;
 	currentSection = CurrentSection::NONE;
+	bool validCode = true;
 	for( unsigned int i = 0; i < code.size(); i++ ) {
 		switch( Directives::GetCode( code[i].GetOperation() ) ) {
 			case 1: { // SECTION
@@ -224,10 +229,10 @@ std::string Semantico::PassagemUnica( std::vector< Expression >& code ) {
 							finalCode[next] = finalCode.size();
 							next = aux;
 						}
-						value = {finalCode.size(), true, false, -1};
+						Symbols[code[i].GetLabel()] = {finalCode.size(), true, false, -1};
 					} else { // Label ja foi declarado
 						Error::Semantico( "Label ja foi previamente declarado.", code[i], 1, code[i].GetLabel().size() );
-						std::exit( EXIT_FAILURE );
+						validCode = false;
 					}
 				}
 				// Insere os 0
@@ -249,10 +254,10 @@ std::string Semantico::PassagemUnica( std::vector< Expression >& code ) {
 							finalCode[next] = finalCode.size();
 							next = aux;
 						}
-						value = {finalCode.size(), true, true, -1};
+						Symbols[code[i].GetLabel()] = {finalCode.size(), true, true, -1};
 					} else { // Label ja foi declarado
 						Error::Semantico( "Label ja foi previamente declarado.", code[i], 1, code[i].GetLabel().size() );
-						std::exit( EXIT_FAILURE );
+						validCode = false;
 					}
 				}
 				// Insere os valor
@@ -276,7 +281,7 @@ std::string Semantico::PassagemUnica( std::vector< Expression >& code ) {
 					Symbols[code[i].GetLabel()] = {finalCode.size(), true, true, -1};
 				} else { // Label ja foi definido
 					Error::Semantico( "Label ja foi previamente definido.", code[i], 1, code[i].GetLabel().size() );
-					std::exit( EXIT_FAILURE );
+					validCode = false;
 				}
 			}
 		}
@@ -292,6 +297,7 @@ std::string Semantico::PassagemUnica( std::vector< Expression >& code ) {
 			case 13: { // OUTPUT
 				if( !LabelExists( code[i].GetOperands()[0], dataLabels ) ) {
 					Error::Semantico( "Usado label de texto quando se esperava de data.", code[i], 1, std::string( code[i] ).size() );
+					validCode = false;
 				}
 				break;
 			}
@@ -301,6 +307,7 @@ std::string Semantico::PassagemUnica( std::vector< Expression >& code ) {
 			case 8: { // JMPZ
 				if( !LabelExists( code[i].GetOperands()[0], textLabels ) ) {
 					Error::Semantico( "Usado label de data quando se esperava de texto.", code[i], 1, std::string( code[i] ).size() );
+					validCode = false;
 				}
 				break;
 			}
@@ -312,6 +319,7 @@ std::string Semantico::PassagemUnica( std::vector< Expression >& code ) {
 				if( !isData || isConst ) {
 					// So pode usar DATA e o primeiro nao pode ser CONST
 					Error::Semantico( "Esperava label de data nao constante (para o primeiro argumento) e nao foi encontrado.", code[i], 1, std::string( code[i] ).size() );
+					validCode = false;
 				}
 				break;
 			}
@@ -335,7 +343,7 @@ std::string Semantico::PassagemUnica( std::vector< Expression >& code ) {
 			int bin = std::stoi( code[i].GetOperands()[0] );
 			if( 4 == opCode && 0 == bin ) {
 				Error::Semantico( "Divisao por zero.", code[i], 1, std::string( code[i] ).size() );
-				std::exit(EXIT_FAILURE);
+				validCode = false;
 			}
 			finalCode.push_back( bin );
 		}
@@ -360,17 +368,30 @@ std::string Semantico::PassagemUnica( std::vector< Expression >& code ) {
 
 	}
 
-	for( unsigned int i = 0; i < offsets.size(); i++ ) {
-		finalCode[std::get<0>(offsets[i])] += std::get<1>(offsets[i]);
+	for( auto it = Symbols.begin(); it != Symbols.end(); it++ ) {
+		if( !std::get<1>( it->second ) ) {
+			Error::PrintError( "Semantico", "Label " + it->first + " usada mas nunca definida.");
+			validCode = false;
+		}
+	}
+	
+	if( validCode ) {
+		for( unsigned int i = 0; i < offsets.size(); i++ ) {
+			finalCode[std::get<0>(offsets[i])] += std::get<1>(offsets[i]);
+		}
+	
+		std::string binary = std::to_string( finalCode[0] );
+		for(unsigned int i = 1; i < finalCode.size(); i++ ) {
+			binary += " ";
+			binary += std::to_string( finalCode[i] );
+		}
+	
+		return binary;
+	} else {
+		std::cout << "Codigo invalido. Codigo final nao gerado.\n";
+		std::exit( EXIT_FAILURE );
 	}
 
-	std::string binary = std::to_string( finalCode[0] );
-	for(unsigned int i = 1; i < finalCode.size(); i++ ) {
-		binary += " ";
-		binary += std::to_string( finalCode[i] );
-	}
-
-	return binary;
 }
 
 bool Semantico::LabelExists( std::string label, auto map ) {

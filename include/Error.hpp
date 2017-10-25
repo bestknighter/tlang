@@ -16,6 +16,7 @@ class Error {
 							  , std::string lineOfCode
 							  , unsigned int highlightStart
 							  , unsigned int highlightEnd );
+		static void PrintError( std::string type, std::string errorMsg );
 };
 
 #endif // ERROR_H

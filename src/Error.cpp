@@ -36,3 +36,11 @@ void Error::PrintError( std::string type, std::string errorMsg, unsigned int lin
 	errMsg += '\n';
 	std::cout << errMsg;
 }
+
+void Error::PrintError( std::string type, std::string errorMsg ) {
+	std::string errMsg = std::string( "Erro (" ) + type + std::string( ") [" );
+	errMsg += Config::inputFile;
+	errMsg += std::string( "]: " ) + errorMsg;
+	errMsg += '\n';
+	std::cout << errMsg;
+}
