@@ -44,20 +44,26 @@ int main( int argc, char* argv[] ) {
 	std::vector< Expression > code;
 
 	// Passagem zero
+	std::fstream codeOutput = std::fstream( Config::outputFile + Config::ext, std::ios_base::out );
+	if( !codeOutput ) {
+		std::cerr << "Nao foi possivel abrir o arquivo para escrita\n";
+		return EXIT_FAILURE;
+	}
 	if( s.PassagemZero( code ) ) {
-		std::fstream codeOutput = std::fstream( Config::outputFile + Config::ext, std::ios_base::out );
-		if( !codeOutput ) {
-			std::cerr << "Nao foi possivel abrir o arquivo para escrita\n";
-			return EXIT_FAILURE;
+		if( 3 > Config::numSteps ) {
+			for( unsigned int i = 0; i < code.size(); i++ ) {
+				codeOutput << std::string( code[i] ) << "\n";
+			}
 		}
-		for( unsigned int i = 0; i < code.size(); i++ ) {
-			codeOutput << std::string( code[i] ) << "\n";
-		}
-		codeOutput.close();
 	} else {
 		std::cout << "Codigo possui erros. Arquivo nao gerado.\n";
+		codeOutput.close();
 		return 0;
 	}
-
+	if( 3 == Config::numSteps ) {
+		codeOutput << s.PassagemUnica( code );
+	}
+	
+	codeOutput.close();
 	return 0;
 }

@@ -6,6 +6,7 @@
 #include "Error.hpp"
 
 #include <stdexcept>
+#include <cstdlib>
 
 Semantico* Semantico::instance = nullptr;
 
@@ -22,8 +23,8 @@ Semantico& Semantico::GetInstance() {
 }
 
 bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
-	std::vector< Expression > preprocessedCode;
-
+	std::array< std::vector< Expression >, 2 > preprocessedCode; // 0 = TEXT, 1 = DATA
+	
 	std::string macroLabel;
 	Expression e;
 	bool eof;
@@ -40,16 +41,41 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 					} else if( e.GetOperands()[0] == "DATA" ) {
 						currentSection = CurrentSection::DATA;
 					}
-					preprocessedCode.push_back( e );
+					preprocessedCode[currentSection].push_back( e );
 					break;
 				}
-				case 2:
-				case 3: { // SPACE e CONST mas so verifica se a label ja existe
+				case 2: { // SPACE mas so verifica se a label ja existe e se esta na secao certa
 					if( LabelExists( e.GetLabel() ) ) {
 						Error::Semantico( "Esta label ja foi previamente definida.", e, 1, e.GetLabel().size() );
 						validCode = false;
 					}
-					preprocessedCode.push_back( e );
+					if( !LabelExists( e.GetLabel(), dataLabels ) ) {
+						dataLabels[e.GetLabel()] = false;
+					}
+					if( CurrentSection::DATA != currentSection ) {
+						Error::Semantico( "Essa diretiva somente e valida na secao data.", e, 1, std::string( e ).size() );
+						validCode = false;
+					}
+					if( CurrentSection::NONE != currentSection ){
+						preprocessedCode[currentSection].push_back( e );
+					}
+					break;
+				}
+				case 3: { // CONST mas so verifica se a label ja existe e se esta na secao certa
+					if( LabelExists( e.GetLabel() ) ) {
+						Error::Semantico( "Esta label ja foi previamente definida.", e, 1, e.GetLabel().size() );
+						validCode = false;
+					}
+					if( !LabelExists( e.GetLabel(), dataLabels ) ) {
+						dataLabels[e.GetLabel()] = true;
+					}
+					if( CurrentSection::DATA != currentSection ) {
+						Error::Semantico( "Essa diretiva somente e valida na secao data.", e, 1, std::string( e ).size() );
+						validCode = false;
+					}
+					if( CurrentSection::NONE != currentSection ){
+						preprocessedCode[currentSection].push_back( e );
+					}
 					break;
 				}
 				case 4: { // EQU
@@ -89,6 +115,10 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 							validCode = false;
 						}
 					}
+					if( CurrentSection::TEXT != currentSection ) {
+						Error::Semantico( "Essa diretiva somente e valida na secao texto.", e, 1, std::string( e ).size() );
+						validCode = false;
+					}
 					break;
 				}
 				case 7: { // END
@@ -102,17 +132,28 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 						Macros[macroLabel] = std::make_tuple( macroStart, preprocessedCode.size() );
 						macroStart = -1;
 					}
+					if( CurrentSection::TEXT != currentSection ) {
+						Error::Semantico( "Essa diretiva somente e valida na secao texto.", e, 1, std::string( e ).size() );
+						validCode = false;
+					}
 					break;
 				}
 				default: {
-					preprocessedCode.push_back(e);
+					preprocessedCode[currentSection].push_back(e);
 				}
 			}
 		} else if( Instruction::Validate( e ) ) {
+			if( CurrentSection::TEXT != currentSection ) {
+				Error::Semantico( "Essa instrucao somente e valida na secao texto.", e, 1, std::string( e ).size() );
+				validCode = false;
+			}
 			// Substituindo EQUs
 			if( LabelExists( e.GetLabel() ) ) {
 				Error::Semantico( "Esta label ja foi previamente definida.", e, 1, e.GetLabel().size() );
 				validCode = false;
+			}
+			if( 0 < e.GetLabel().size() && !LabelExists( e.GetLabel(), textLabels ) ) {
+				textLabels[e.GetLabel()] = false;
 			}
 			auto value = EQUs.find( e.GetOperands()[0] );
 			if( value != EQUs.end() ) {
@@ -122,13 +163,19 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 			if( value != EQUs.end() ) {
 				e.ReplaceOperand( 1, std::to_string( value->second ) );
 			}
-			preprocessedCode.push_back( e );
+			if( CurrentSection::NONE != currentSection ){
+				preprocessedCode[currentSection].push_back( e );
+			}
 		} else {
+			if( CurrentSection::TEXT != currentSection ) {
+				Error::Semantico( "Essa instrucao somente e valida na secao texto.", e, 1, std::string( e ).size() );
+				validCode = false;
+			}
 			if( 2 <= Config::numSteps ) {
 				try { // Expansao de macros
 					auto bounds = Macros.at( e.GetOperation() );
 					for( unsigned int i = std::get<0>(bounds); i < std::get<1>(bounds); i++ ) {
-						preprocessedCode.push_back( preprocessedCode[i] );
+						preprocessedCode[currentSection].push_back( preprocessedCode[currentSection][i] );
 					}
 				} catch( std::out_of_range &err ) {
 					int column = e.GetLabel().size();
@@ -137,21 +184,182 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 					validCode = false;
 				}
 			} else {
-				preprocessedCode.push_back( e );
+				if( CurrentSection::NONE != currentSection ){
+					preprocessedCode[currentSection].push_back( e );
+				}
 			}
 		}
 	} while( !eof );
 
-	preproCode = preprocessedCode;
+	preproCode = preprocessedCode[0];
+	for( unsigned int i = 0; i < preprocessedCode[1].size(); i++ ) {
+		preproCode.push_back( preprocessedCode[1][i] );
+	}
+
 	return validCode;
 }
 
 std::string Semantico::PassagemUnica( std::vector< Expression >& code ) {
 	std::vector< int > finalCode;
-
+	currentSection = CurrentSection::NONE;
 	for( unsigned int i = 0; i < code.size(); i++ ) {
-		
+		switch( Directives::GetCode( code[i].GetOperation() ) ) {
+			case 1: { // SECTION
+				if( code[i].GetOperands()[0] == "TEXT" ) {
+					currentSection = CurrentSection::TEXT;
+				} else if( code[i].GetOperands()[0] == "DATA" ) {
+					currentSection = CurrentSection::DATA;
+				}
+				continue;
+			}
+			case 2: { // SPACE
+				if( !LabelExists( code[i].GetLabel() ) ) { // Label nao existia
+					Symbols[code[i].GetLabel()] = {finalCode.size(), true, false, -1};
+				} else { // Label ja existe
+					auto value = Symbols[code[i].GetLabel()];
+					if( !std::get<1>(value) ) { // Label so foi referenciado
+						int next = std::get<3>(value);
+						while( next != -1 ) {
+							next = finalCode[next];
+							finalCode[next] = finalCode.size();
+						}
+						value = {finalCode.size(), true, false, -1};
+					} else { // Label ja foi declarado
+						Error::Semantico( "Label ja foi previamente declarado.", code[i], 1, code[i].GetLabel().size() );
+						std::exit( EXIT_FAILURE );
+					}
+				}
+				// Insere os 0
+				unsigned int amount = 0 == code[i].GetOperands()[0].size() ? 1 : std::stoi( code[i].GetOperands()[0] );
+				for(unsigned int i = 0; i < amount ; i++ ) {
+					finalCode.push_back( 0 );
+				}
+				continue;
+			}
+			case 3: { // CONST
+				if( !LabelExists( code[i].GetLabel() ) ) { // Label nao existia
+					Symbols[code[i].GetLabel()] = {finalCode.size(), true, true, -1};
+				} else { // Label ja existe
+					auto value = Symbols[code[i].GetLabel()];
+					if( !std::get<1>(value) ) { // Label so foi referenciado
+						int next = std::get<3>(value);
+						while( next != -1 ) {
+							next = finalCode[next];
+							finalCode[next] = finalCode.size();
+						}
+						value = {finalCode.size(), true, true, -1};
+					} else { // Label ja foi declarado
+						Error::Semantico( "Label ja foi previamente declarado.", code[i], 1, code[i].GetLabel().size() );
+						std::exit( EXIT_FAILURE );
+					}
+				}
+				// Insere os valor
+				finalCode.push_back( std::stoi( code[i].GetOperands()[0] ) + code[i].GetOffsets()[0] );
+				continue;
+			}
+		}
+
+		if( 0 < code[i].GetLabel().size() ) { // Tem label
+			if( !LabelExists( code[i].GetLabel() ) ) { // Label nao foi declarado e define
+				Symbols[code[i].GetLabel()] = {finalCode.size(), true, true, -1};
+			} else { // Label foi declarado
+				auto value = Symbols[code[i].GetLabel()];
+				if( !std::get<1>(value) ) { // Label so foi referenciado
+					int next = std::get<3>(value);
+					while( next != -1 ) {
+						next = finalCode[next];
+						finalCode[next] = finalCode.size();
+					}
+					value = {finalCode.size(), true, true, -1};
+				} else { // Label ja foi definido
+					Error::Semantico( "Label ja foi previamente definido.", code[i], 1, code[i].GetLabel().size() );
+					std::exit( EXIT_FAILURE );
+				}
+			}
+		}
+
+		int opCode = Instruction::GetOpcode( code[i].GetOperation() );
+		finalCode.push_back( opCode );
+		switch( opCode ) {
+			case 1: // ADD
+			case 2: // SUB
+			case 3: // MULT
+			case 4: // DIV
+			case 10: // LOAD
+			case 13: { // OUTPUT
+				if( !LabelExists( code[i].GetOperands()[0], dataLabels ) ) {
+					Error::Semantico( "Usado label de texto quando se esperava de data.", code[i], 1, std::string( code[i] ).size() );
+				}
+				break;
+			}
+			case 5: // JMP
+			case 6: // JMPN
+			case 7: // JMPP
+			case 8: { // JMPZ
+				if( !LabelExists( code[i].GetOperands()[0], textLabels ) ) {
+					Error::Semantico( "Usado label de data quando se esperava de texto.", code[i], 1, std::string( code[i] ).size() );
+				}
+				break;
+			}
+			case 9: // COPY
+			case 11: // STORE
+			case 12: { // INPUT
+				if( !LabelExists( code[i].GetOperands()[0], dataLabels ) || !dataLabels[code[i].GetOperands()[0]] ) {
+					// So pode usar DATA e o primeiro nao pode ser CONST
+					Error::Semantico( "Esperava label de data nao constante (para o primeiro argumento) e nao foi encontrado.", code[i], 1, std::string( code[i] ).size() );
+				}
+				break;
+			}
+		}
+
+		if( 0 < code[i].GetOperands()[0].size() ) { // Tem operando
+			if ( !LabelExists( code[i].GetLabel() ) ) { // Nao foi declarado
+				code[i].ReplaceOperand(0, "-1" );
+				Symbols[code[i].GetOperands()[0]] = {0, false, false, finalCode.size()};
+			} else { // Label foi declarado
+				auto value = Symbols[code[i].GetLabel()];
+				if( !std::get<1>(value) ) { // Label so foi referenciado
+					int next = std::get<3>(value);
+					code[i].ReplaceOperand(0, std::to_string( next ) );
+					value = {0, false, false, finalCode.size()};
+				} else { // Label ja foi definido
+					code[i].ReplaceOperand(0, std::to_string( std::get<0>( value ) ) );
+				}
+			}
+			int bin = std::stoi( code[i].GetOperands()[0] ) + code[i].GetOffsets()[0];
+			if( 4 == opCode && 0 == bin ) {
+				Error::Semantico( "Divisao por zero.", code[i], 1, std::string( code[i] ).size() );
+				std::exit(EXIT_FAILURE);
+			}
+			finalCode.push_back( bin );
+		}
+
+		if( 0 < code[i].GetOperands()[1].size() ) { // Tem operando
+			if ( !LabelExists( code[i].GetLabel() ) ) { // Nao foi declarado
+				code[i].ReplaceOperand(1, "-1" );
+				Symbols[code[i].GetOperands()[1]] = {0, false, false, finalCode.size()};
+			} else { // Label foi declarado
+				auto value = Symbols[code[i].GetLabel()];
+				if( !std::get<1>(value) ) { // Label so foi referenciado
+					int next = std::get<3>(value);
+					code[i].ReplaceOperand(1, std::to_string( next ) );
+					value = {0, false, false, finalCode.size()};
+				} else { // Label ja foi definido
+					code[i].ReplaceOperand(1, std::to_string( std::get<0>( value ) ) );
+				}
+			}
+			finalCode.push_back( std::stoi( code[i].GetOperands()[1] ) + code[i].GetOffsets()[1] );
+		}
+
 	}
+
+	std::string binary = std::to_string( finalCode[0] );
+	for(unsigned int i = 1; i < finalCode.size(); i++ ) {
+		binary += " ";
+		binary += std::to_string( finalCode[i] );
+	}
+
+	return binary;
 }
 
 bool Semantico::LabelExists( std::string label, auto map ) {
@@ -162,8 +370,7 @@ bool Semantico::LabelExists( std::string label, auto map ) {
 bool Semantico::LabelExists( std::string label ) {
 	bool exists = false;
 
-	exists |= LabelExists( label, DataLabels );
-	exists |= LabelExists( label, CodeLabels );
+	exists |= LabelExists( label, Symbols );
 	exists |= LabelExists( label, EQUs );
 	exists |= LabelExists( label, Macros );
 
