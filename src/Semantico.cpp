@@ -304,7 +304,9 @@ std::string Semantico::PassagemUnica( std::vector< Expression >& code ) {
 			case 9: // COPY
 			case 11: // STORE
 			case 12: { // INPUT
-				if( !LabelExists( code[i].GetOperands()[0], dataLabels ) || !dataLabels[code[i].GetOperands()[0]] ) {
+				bool isData = LabelExists( code[i].GetOperands()[0], dataLabels );
+				bool isConst = dataLabels[code[i].GetOperands()[0]];
+				if( !isData || isConst ) {
 					// So pode usar DATA e o primeiro nao pode ser CONST
 					Error::Semantico( "Esperava label de data nao constante (para o primeiro argumento) e nao foi encontrado.", code[i], 1, std::string( code[i] ).size() );
 				}
