@@ -220,8 +220,9 @@ std::string Semantico::PassagemUnica( std::vector< Expression >& code ) {
 					if( !std::get<1>(value) ) { // Label so foi referenciado
 						int next = std::get<3>(value);
 						while( next != -1 ) {
-							next = finalCode[next];
+							int aux = finalCode[next];
 							finalCode[next] = finalCode.size();
+							next = aux;
 						}
 						value = {finalCode.size(), true, false, -1};
 					} else { // Label ja foi declarado
@@ -244,8 +245,9 @@ std::string Semantico::PassagemUnica( std::vector< Expression >& code ) {
 					if( !std::get<1>(value) ) { // Label so foi referenciado
 						int next = std::get<3>(value);
 						while( next != -1 ) {
-							next = finalCode[next];
+							int aux = finalCode[next];
 							finalCode[next] = finalCode.size();
+							next = aux;
 						}
 						value = {finalCode.size(), true, true, -1};
 					} else { // Label ja foi declarado
@@ -260,17 +262,18 @@ std::string Semantico::PassagemUnica( std::vector< Expression >& code ) {
 		}
 
 		if( 0 < code[i].GetLabel().size() ) { // Tem label
-			if( !LabelExists( code[i].GetLabel() ) ) { // Label nao foi declarado e define
+			if( !LabelExists( code[i].GetLabel(), Symbols ) ) { // Label nao foi declarado e define
 				Symbols[code[i].GetLabel()] = {finalCode.size(), true, true, -1};
 			} else { // Label foi declarado
 				auto value = Symbols[code[i].GetLabel()];
 				if( !std::get<1>(value) ) { // Label so foi referenciado
 					int next = std::get<3>(value);
 					while( next != -1 ) {
-						next = finalCode[next];
+						int aux = finalCode[next];
 						finalCode[next] = finalCode.size();
+						next = aux;
 					}
-					value = {finalCode.size(), true, true, -1};
+					Symbols[code[i].GetLabel()] = {finalCode.size(), true, true, -1};
 				} else { // Label ja foi definido
 					Error::Semantico( "Label ja foi previamente definido.", code[i], 1, code[i].GetLabel().size() );
 					std::exit( EXIT_FAILURE );
@@ -315,20 +318,20 @@ std::string Semantico::PassagemUnica( std::vector< Expression >& code ) {
 		}
 
 		if( 0 < code[i].GetOperands()[0].size() ) { // Tem operando
-			if ( !LabelExists( code[i].GetLabel() ) ) { // Nao foi declarado
-				code[i].ReplaceOperand(0, "-1" );
+			if ( !LabelExists( code[i].GetOperands()[0], Symbols ) ) { // Nao foi declarado
 				Symbols[code[i].GetOperands()[0]] = {0, false, false, finalCode.size()};
+				code[i].ReplaceOperand(0, "-1" );
 			} else { // Label foi declarado
-				auto value = Symbols[code[i].GetLabel()];
+				auto value = Symbols[code[i].GetOperands()[0]];
 				if( !std::get<1>(value) ) { // Label so foi referenciado
 					int next = std::get<3>(value);
+					Symbols[code[i].GetOperands()[0]] = {0, false, false, finalCode.size()};
 					code[i].ReplaceOperand(0, std::to_string( next ) );
-					value = {0, false, false, finalCode.size()};
 				} else { // Label ja foi definido
 					code[i].ReplaceOperand(0, std::to_string( std::get<0>( value ) ) );
 				}
 			}
-			int bin = std::stoi( code[i].GetOperands()[0] ) + code[i].GetOffsets()[0];
+			int bin = std::stoi( code[i].GetOperands()[0] ) + code[i].GetOffsets()[0]; // Nao se poe os offsets aqui
 			if( 4 == opCode && 0 == bin ) {
 				Error::Semantico( "Divisao por zero.", code[i], 1, std::string( code[i] ).size() );
 				std::exit(EXIT_FAILURE);
@@ -337,15 +340,15 @@ std::string Semantico::PassagemUnica( std::vector< Expression >& code ) {
 		}
 
 		if( 0 < code[i].GetOperands()[1].size() ) { // Tem operando
-			if ( !LabelExists( code[i].GetLabel() ) ) { // Nao foi declarado
-				code[i].ReplaceOperand(1, "-1" );
+			if ( !LabelExists( code[i].GetOperands()[1], Symbols ) ) { // Nao foi declarado
 				Symbols[code[i].GetOperands()[1]] = {0, false, false, finalCode.size()};
+				code[i].ReplaceOperand(1, "-1" );
 			} else { // Label foi declarado
-				auto value = Symbols[code[i].GetLabel()];
+				auto value = Symbols[code[i].GetOperands()[1]];
 				if( !std::get<1>(value) ) { // Label so foi referenciado
 					int next = std::get<3>(value);
+					Symbols[code[i].GetOperands()[1]] = {0, false, false, finalCode.size()};
 					code[i].ReplaceOperand(1, std::to_string( next ) );
-					value = {0, false, false, finalCode.size()};
 				} else { // Label ja foi definido
 					code[i].ReplaceOperand(1, std::to_string( std::get<0>( value ) ) );
 				}
