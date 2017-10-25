@@ -6,15 +6,24 @@
 #include <stdexcept>
 #include <regex>
 
-const std::map< std::string, unsigned int > Instruction::mnemToOpcode = { {"ADD", 1}, {"SUB", 2}, {"MULT", 3}
-																		, {"DIV", 4}, {"JMP", 5}, {"JMPN", 6}
-																		, {"JMPP", 7}, {"JMPZ", 8}, {"COPY", 9}
-																		, {"LOAD", 10}, {"STORE", 11}, {"INPUT", 12}
-																		, {"OUTPUT", 13}, {"STOP", 14} };
+const std::map< std::string, std::tuple< unsigned int, unsigned int > > Instruction::instMap = { {"ADD", {1, 2} }, {"SUB", {2, 2} }, {"MULT", {3, 2} }
+																							   , {"DIV", {4, 2} }, {"JMP", {5, 2} }, {"JMPN", {6, 2} }
+																							   , {"JMPP", {7, 2} }, {"JMPZ", {8, 2} }, {"COPY", {9, 3} }
+																							   , {"LOAD", {10, 2} }, {"STORE", {11, 2} }, {"INPUT", {12, 2} }
+																							   , {"OUTPUT", {13, 2} }, {"STOP", {14, 1} } };
 
 int Instruction::GetOpcode( std::string key ) {
 	try {
-		unsigned int opcode = mnemToOpcode.at( key );
+		unsigned int opcode = std::get<0>( instMap.at( key ) );
+		return int(opcode);
+	} catch(std::out_of_range &e) {
+		return -1;
+	}
+}
+
+int Instruction::GetOpsize( std::string key ) {
+	try {
+		unsigned int opcode = std::get<1>( instMap.at( key ) );
 		return int(opcode);
 	} catch(std::out_of_range &e) {
 		return -1;
@@ -56,7 +65,7 @@ bool Instruction::ValidateNoArg( Expression exp ) {
 		int column = exp.GetLabel().size();
 		column += 2*(column>0) + 1;
 		Error::Semantico( "Essa instrucao nao aceita argumentos.", exp, column, std::string( exp ).size() );
-		return false;
+		exp.Invalidate();
 	}
 	return true;
 }
@@ -66,13 +75,13 @@ bool Instruction::ValidateSingleArg( Expression exp ) {
 		int column = exp.GetLabel().size();
 		column += 2*(column>0) + 1;
 		Error::Semantico( "Essa instrucao nao aceita dois argumentos.", exp, column, std::string( exp ).size() );
-		return false;
+		exp.Invalidate();
 	}
 	if( std::regex_match( exp.GetOperands()[0], Token::Number ) ) {
 		int column = exp.GetLabel().size();
 		column += 2*(column>0) + 1;
 		Error::Semantico( "Essa instrucao nao aceita argumento numerico.", exp, column, std::string( exp ).size() );
-		return false;
+		exp.Invalidate();
 	}
 	return true;
 }
@@ -82,13 +91,13 @@ bool Instruction::ValidateTwoArg( Expression exp ) {
 		int column = exp.GetLabel().size();
 		column += 2*(column>0) + 1;
 		Error::Semantico( "Essa instrucao requisita dois argumentos.", exp, column, std::string( exp ).size() );
-		return false;
+		exp.Invalidate();
 	}
 	if( std::regex_match( exp.GetOperands()[0], Token::Number ) || std::regex_match( exp.GetOperands()[1], Token::Number ) ) {
 		int column = exp.GetLabel().size();
 		column += 2*(column>0) + 1;
 		Error::Semantico( "Essa instrucao nao aceita argumento numerico.", exp, column, std::string( exp ).size() );
-		return false;
+		exp.Invalidate();
 	}
 	return true;
 }

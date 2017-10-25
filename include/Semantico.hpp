@@ -14,11 +14,12 @@ class Semantico {
 		static Semantico& GetInstance();
 
 		bool PassagemZero( std::vector< Expression >& preproCode);
-		bool PassagemUnica( std::vector< Expression >& code );
+		std::string PassagemUnica( std::vector< Expression >& code );
 	private:
 		Semantico();
 		static Semantico* instance;
 		bool LabelExists( std::string label );
+		bool LabelExists( std::string label, auto map);
 
 		Parser& p;
 		enum CurrentSection {
@@ -29,7 +30,8 @@ class Semantico {
 		int macroStart;
 		std::map< std::string, int > EQUs;
 		std::map< std::string, std::tuple< unsigned int, unsigned int > > Macros;
-		std::map< std::string, unsigned int > Labels;
+		std::map< std::string, unsigned int > CodeLabels;
+		std::map< std::string, unsigned int > DataLabels;
 };
 
 #endif // SEMANTICO_HPP

@@ -30,6 +30,7 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 	bool validCode = true;
 	do {
 		eof = p.GetNextExpression(e);
+		validCode &= e.IsValid();
 		if( Directives::Validate( e ) ) {
 			// Executa diretivas que se executam na passagem zero
 			switch( Directives::GetCode( e.GetOperation() ) ) {
@@ -38,6 +39,15 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 						currentSection = CurrentSection::TEXT;
 					} else if( e.GetOperands()[0] == "DATA" ) {
 						currentSection = CurrentSection::DATA;
+					}
+					preprocessedCode.push_back( e );
+					break;
+				}
+				case 2:
+				case 3: { // SPACE e CONST mas so verifica se a label ja existe
+					if( LabelExists( e.GetLabel() ) ) {
+						Error::Semantico( "Esta label ja foi previamente definida.", e, 1, e.GetLabel().size() );
+						validCode = false;
 					}
 					preprocessedCode.push_back( e );
 					break;
@@ -136,27 +146,26 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 	return validCode;
 }
 
-bool Semantico::PassagemUnica( std::vector< Expression >& code ) {
-	
+std::string Semantico::PassagemUnica( std::vector< Expression >& code ) {
+	std::vector< int > finalCode;
+
+	for( unsigned int i = 0; i < code.size(); i++ ) {
+		
+	}
+}
+
+bool Semantico::LabelExists( std::string label, auto map ) {
+	auto value = map.find( label );
+	return value != map.end();
 }
 
 bool Semantico::LabelExists( std::string label ) {
 	bool exists = false;
 
-	{
-		auto value = EQUs.find( label );
-		exists |= (value != EQUs.end());
-	}
-
-	{
-		auto value = Macros.find( label );
-		exists |= (value != Macros.end());
-	}
-
-	{
-		auto value = Labels.find( label );
-		exists |= (value != Labels.end());
-	}
+	exists |= LabelExists( label, DataLabels );
+	exists |= LabelExists( label, CodeLabels );
+	exists |= LabelExists( label, EQUs );
+	exists |= LabelExists( label, Macros );
 
 	return exists;
 }

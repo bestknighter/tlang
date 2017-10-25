@@ -14,6 +14,10 @@ bool Expression::IsValid() {
 	return isValid;
 }
 
+void Expression::Invalidate() {
+	isValid = false;
+}
+
 unsigned int Expression::GetLineInSource() {
 	return lineInSource;
 }

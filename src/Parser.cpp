@@ -45,6 +45,19 @@ bool Parser::GetNextExpression( Expression& exp ) {
 	lineBeingProcessed = nextToken->GetLine();
 
 	exp = CreateExpression( tokens );
+	if( 0 < exp.GetLabel().size() && 0 == exp.GetOperation().size() ) { // Label sozinho
+		Expression exp2;
+		eof = GetNextExpression( exp2 );
+		if( 0 == exp2.GetLabel().size() ) { // Proxima linha nao tem label
+			exp = Expression( exp.IsValid() && exp2.IsValid()
+							, exp2.GetLineInSource(), exp.GetLabel()
+							, exp2.GetOperation(), exp2.GetOperands()[0]
+							, exp2.GetOperands()[1], exp2.GetOffsets()[0]
+							, exp2.GetOffsets()[1] );
+		} else {
+			Error::Sintatico( "Proibido declaracao de duas labels por linha de codigo.", tokens[0] );
+		}
+	}
 	return eof;
 }
 
@@ -99,9 +112,9 @@ Expression Parser::CreateExpression( std::vector< Token > tokens ) {
 		operation = tokens[i].GetText(); // Detectar erros disso
 		for( i++ ; i < tokens.size(); i++ ) {
 			if( ":" == tokens[i].GetText() ) { // Opa! Labels ja deveriam ter sido tratados. Isso significa que o label esta num local incorreto
-				Error::Sintatico( "Declaracao de label em local nao-esperado!\n\tDeclaracao de labels, quando usados, devem ser a primeira instrucao na linha.", tokens[i-1] );
+				Error::Sintatico( "Declaracao de label em local nao esperado!\nDeclaracao de labels, quando usados, devem ser a primeira instrucao na linha.\nIsso pode ser tambem pela declaracao proibida de mais de uma label por instrucao.", tokens[i-1] );
 				valid = false;
-				continue;
+				break;
 			}
 			if( "," == tokens[i].GetText() ) {
 				opn++;

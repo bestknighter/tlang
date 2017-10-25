@@ -9,6 +9,7 @@ struct Expression {
 		Expression( bool isValid, unsigned int lineInSource, std::string label, std::string operation, std::string operand1 = "", std::string operand2 = "", int offset1 = 0, int offset2 = 0 );
 
 		bool IsValid();
+		void Invalidate();
 		unsigned int GetLineInSource();
 		std::string GetLabel();
 		std::string GetOperation();
