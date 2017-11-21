@@ -24,6 +24,8 @@ CD = cd
 # Make
 MAKE = make
 
+PROGS = montador ligador carregador
+
 #-------------------------------------------------------------
 # Caso seja Windows											 |
 #-------------------------------------------------------------
@@ -46,50 +48,40 @@ endif
 .PHONY: clean release debug folders
 .IGNORE: clean
 
-release:
-	$(CD) montador && $(MAKE) release
-	$(CD) ligador && $(MAKE) release
-	$(CD) carregador && $(MAKE) release
+release: do_release copy
+
+do_release:
+	$(foreach PROG,$(PROGS),$(call run_cmd,$(CD) $(PROG) && $(MAKE) release))
+
+debug: do_debug copy
+
+do_debug:
+	$(foreach PROG,$(PROGS),$(call run_cmd,$(CD) $(PROG) && $(MAKE) debug))
+
+copy:
 ifeq ($(OS), Windows_NT)
-	copy montador\montador.exe montador.exe
-	copy ligador\ligador.exe ligador.exe
-	copy carregador\carregador.exe carregador.exe
+	$(foreach PROG,$(PROGS),$(call run_cmd,copy $(PROG)\$(PROG).exe $(PROG).exe))
 else
-	cp montador/montador .
-	cp ligador/ligador .
-	cp carregador/carregador .
+	$(foreach PROG,$(PROGS),$(call run_cmd,copy $(PROG)/$(PROG) .))
 endif
 
-debug:
-	$(CD) montador && $(MAKE) debug
-	$(CD) ligador && $(MAKE) debug
-	$(CD) carregador && $(MAKE) debug
-ifeq ($(OS), Windows_NT)
-	copy montador\montador.exe montador.exe
-	copy ligador\ligador.exe ligador.exe
-	copy carregador\carregador.exe carregador.exe
-else
-	cp montador/montador .
-	cp ligador/ligador .
-	cp carregador/carregador .
-endif
+clean: clean_inner clean_this
 
-clean: clean_this
-clean:
-	$(CD) montador && $(MAKE) clean
-	$(CD) ligador && $(MAKE) clean
-	$(CD) carregador && $(MAKE) clean
+clean_inner:
+	$(foreach PROG,$(PROGS),$(call run_cmd,$(CD) $(PROG) && $(MAKE) clean))
 
 clean_this:
 ifeq ($(OS), Windows_NT)
-	$(RM) montador.exe
-	$(RM) ligador.exe
-	$(RM) carregador.exe
+	$(foreach PROG,$(PROGS),$(call run_cmd,$(RM) $(PROG).exe))
 else
-	$(RM) montador
-	$(RM) ligador
-	$(RM) carregador
+	$(foreach PROG,$(PROGS),$(call run_cmd,$(RM) $(PROG)))
 endif
+
+# A linha em branco abaixo de $(1) é de extrema importância! Não apagar!
+define run_cmd
+	$(1)
+	
+endef
 
 # Regra pra debug
 print-%:
