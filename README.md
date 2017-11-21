@@ -1,5 +1,5 @@
 # tlang
-[tlang](https://github.com/bestknighter/tlang) is a set of tools for assembling codes for a toy ISA
+[tlang](https://github.com/bestknighter/tlang) is toolchain for assembling codes for a toy ISA
 
 Developed for Windows 10 x64 but with Linux compatiblity (not tested) in mind.
 

@@ -45,36 +45,36 @@ endif
 #############################################################################################
 #############################################################################################
 
-.PHONY: clean release debug folders
-.IGNORE: clean
+.PHONY: clean clean_this clean_inner release do_release debug do_debug copy
+.IGNORE: clean clean_inner clean_this
 
 release: do_release copy
 
 do_release:
-	$(foreach PROG,$(PROGS),$(call run_cmd,$(CD) $(PROG) && $(MAKE) release))
+	-@$(foreach PROG,$(PROGS),$(call run_cmd,$(CD) $(PROG) && $(MAKE) release))
 
 debug: do_debug copy
 
 do_debug:
-	$(foreach PROG,$(PROGS),$(call run_cmd,$(CD) $(PROG) && $(MAKE) debug))
+	-@$(foreach PROG,$(PROGS),$(call run_cmd,$(CD) $(PROG) && $(MAKE) debug))
 
 copy:
 ifeq ($(OS), Windows_NT)
-	$(foreach PROG,$(PROGS),$(call run_cmd,copy $(PROG)\$(PROG).exe $(PROG).exe))
+	-@$(foreach PROG,$(PROGS),$(call run_cmd,copy $(PROG)\$(PROG).exe $(PROG).exe))
 else
-	$(foreach PROG,$(PROGS),$(call run_cmd,copy $(PROG)/$(PROG) .))
+	-@$(foreach PROG,$(PROGS),$(call run_cmd,cp $(PROG)/$(PROG) .))
 endif
 
 clean: clean_inner clean_this
 
 clean_inner:
-	$(foreach PROG,$(PROGS),$(call run_cmd,$(CD) $(PROG) && $(MAKE) clean))
+	-@$(foreach PROG,$(PROGS),$(call run_cmd,$(CD) $(PROG) && $(MAKE) clean))
 
 clean_this:
 ifeq ($(OS), Windows_NT)
-	$(foreach PROG,$(PROGS),$(call run_cmd,$(RM) $(PROG).exe))
+	-@$(foreach PROG,$(PROGS),$(call run_cmd,$(RM) $(PROG).exe))
 else
-	$(foreach PROG,$(PROGS),$(call run_cmd,$(RM) $(PROG)))
+	-@$(foreach PROG,$(PROGS),$(call run_cmd,$(RM) $(PROG)))
 endif
 
 # A linha em branco abaixo de $(1) é de extrema importância! Não apagar!
