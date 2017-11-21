@@ -24,29 +24,6 @@ CD = cd
 # Make
 MAKE = make
 
-FLAGS = -std=c++14 -Wall -Wextra -fmax-errors=5 -Wno-unused-parameter -fdiagnostics-color -Werror=init-self
-DPFLAGS = -M -MT $(OBJ_PATH)/$(*F).o -MP -MF $@
-RLFLAGS = -O3 -DDEBUG=0
-DBFLAGS = -ggdb -O0 -DDEBUG=1
-LIBS = 
-
-SRC_PATH = src
-INC_PATH = include
-DEP_PATH = dep
-OBJ_PATH = bin
-
-SRC_FILES = $(wildcard $(SRC_PATH)/*.cpp)
-INC_FILES = $(wildcard $(INC_PATH)/*.hpp)
-DEP_FILES = $(addprefix $(DEP_PATH)/,$(notdir $(SRC_FILES:.cpp=.d)))
-OBJ_FILES = $(addprefix $(OBJ_PATH)/,$(notdir $(SRC_FILES:.cpp=.o)))
-
-INC_PATHS = -I$(INC_PATH)
-
-
-# Nome do executável
-EXEC = montador
-
-
 #-------------------------------------------------------------
 # Caso seja Windows											 |
 #-------------------------------------------------------------
@@ -61,12 +38,6 @@ RM = del /q
 # Make
 MAKE = mingw32-make
 
-FLAGS += -mconsole
-LIBS := -lmingw32 $(LIBS)
-
-# Nome do executável
-EXEC := $(EXEC).exe
-
 endif
 
 #############################################################################################
@@ -75,44 +46,51 @@ endif
 .PHONY: clean release debug folders
 .IGNORE: clean
 
-release: FLAGS += $(RLFLAGS)
-release: $(EXEC)
-
-debug: FLAGS += $(DBFLAGS)
-debug: $(EXEC)
-
-clean:
-	-@$(RMDIR) "$(DEP_PATH)"
-	-@$(RMDIR) "$(OBJ_PATH)"
-	-@$(RM) $(EXEC)
-
-folders:
+release:
+	$(CD) montador && $(MAKE) release
+	$(CD) ligador && $(MAKE) release
+	$(CD) carregador && $(MAKE) release
 ifeq ($(OS), Windows_NT)
-	@if NOT exist $(DEP_PATH) ( mkdir $(DEP_PATH) )
-	@if NOT exist $(OBJ_PATH) ( mkdir $(OBJ_PATH) )
-	@if NOT exist $(INC_PATH) ( mkdir $(INC_PATH) )
-	@if NOT exist $(SRC_PATH) ( mkdir $(SRC_PATH) )
+	copy montador\montador.exe montador.exe
+	copy ligador\ligador.exe ligador.exe
+	copy carregador\carregador.exe carregador.exe
 else
-	@mkdir -p $(DEP_PATH) $(OBJ_PATH) $(INC_PATH) $(SRC_PATH)
+	cp montador/montador .
+	cp ligador/ligador .
+	cp carregador/carregador .
 endif
 
-$(DEP_PATH)/%.d: $(SRC_PATH)/%.cpp $(INC_PATH)/%.hpp | folders
-	$(COMPILER) $(INC_PATHS) $< $(DPFLAGS)
-$(DEP_PATH)/%.d: $(SRC_PATH)/%.cpp | folders
-	$(COMPILER) $(INC_PATHS) $< $(DPFLAGS)
-$(DEP_PATH)/%.d: $(SRC_PATH)/%.hpp | folders
-	$(COMPILER) $(INC_PATHS) $< $(DPFLAGS)
+debug:
+	$(CD) montador && $(MAKE) debug
+	$(CD) ligador && $(MAKE) debug
+	$(CD) carregador && $(MAKE) debug
+ifeq ($(OS), Windows_NT)
+	copy montador\montador.exe montador.exe
+	copy ligador\ligador.exe ligador.exe
+	copy carregador\carregador.exe carregador.exe
+else
+	cp montador/montador .
+	cp ligador/ligador .
+	cp carregador/carregador .
+endif
 
-$(OBJ_PATH)/%.o: $(SRC_PATH)/%.cpp $(DEP_PATH)/%.d | folders
-	$(COMPILER) $(INC_PATHS) $< -c $(FLAGS) -o $@
+clean:
+	$(CD) montador && $(MAKE) clean
+	$(CD) ligador && $(MAKE) clean
+	$(CD) carregador && $(MAKE) clean
+clean: clean_this
 
-$(EXEC): $(DEP_FILES) $(OBJ_FILES)
-	$(COMPILER) -o $@ $(OBJ_FILES) $(LIBS)
-
+clean_this:
+ifeq ($(OS), Windows_NT)
+	$(RM) montador.exe
+	$(RM) ligador.exe
+	$(RM) carregador.exe
+else
+	$(RM) montador
+	$(RM) ligador
+	$(RM) carregador
+endif
 
 # Regra pra debug
 print-%:
 	@echo $* = $($*)
-
--include $$(DEP_FILES)
-	
