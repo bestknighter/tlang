@@ -74,11 +74,11 @@ else
 	cp carregador/carregador .
 endif
 
+clean: clean_this
 clean:
 	$(CD) montador && $(MAKE) clean
 	$(CD) ligador && $(MAKE) clean
 	$(CD) carregador && $(MAKE) clean
-clean: clean_this
 
 clean_this:
 ifeq ($(OS), Windows_NT)
