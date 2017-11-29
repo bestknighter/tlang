@@ -25,7 +25,7 @@ CD = cd
 MAKE = make
 
 FLAGS = -std=c++14 -Wall -Wextra -fmax-errors=5 -Wno-unused-parameter -fdiagnostics-color -Werror=init-self
-DPFLAGS = -M -MT $(OBJ_PATH)/$(*F).o -MP -MF $@
+DPFLAGS = -M -MT $(OBJ_PATH)/$(*F).o -MP -MF $@ $(FLAGS)
 RLFLAGS = -O3 -DDEBUG=0
 DBFLAGS = -ggdb -O0 -DDEBUG=1
 LIBS = 

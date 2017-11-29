@@ -9,9 +9,6 @@
 # Assumindo UNIX											 |
 #-------------------------------------------------------------
 
-# Compilador
-COMPILER = g++
-
 # Remover pastas
 RMDIR = rm -rf
 
