@@ -34,7 +34,7 @@ int main(int argc, const char **argv){
             num_arquivos--;
             break;
         }
-    // PRIMEIRA ETAPA: MONTAR TABELAS DE DEFINI��O E USO DO C�DIGO
+    // PRIMEIRA ETAPA: MONTAR TABELAS DE DEFINIÇÃO E USO DO CÓDIGO
         while (getline (prog,linha)){
             aux_linha=std::strtok(const_cast<char*>(linha.c_str())," ");
 
@@ -63,7 +63,7 @@ int main(int argc, const char **argv){
                 continue;
             }
 
-            //Armazena a tabela de defini��es em um mapa
+            //Armazena a tabela de definições em um mapa
             if(!strcmp(aux_linha,"TD:")){
                 aux_linha=strtok(NULL, " ");
                  while(aux_linha!=NULL){
@@ -84,7 +84,7 @@ int main(int argc, const char **argv){
                  }
                  continue;
             }
-            //Armazena codigo montado
+            //Armazena codigo montado e adiciona fator de correção
             if(!strcmp(aux_linha,"T:")){
                 aux_linha=strtok(NULL, " ");
                 int j=fator_correcao;
@@ -109,7 +109,8 @@ int main(int argc, const char **argv){
         num_arquivos--;
         i++;
     }
-
+    
+    //ARRUMA OS ENDEREÇOS COM AS INFORMAÇÕES DA TABELA DE USO
     std::stringstream codigo(codigo_completo);
     std::istream_iterator<std::string> begin(codigo);
     std::istream_iterator<std::string> end;
@@ -124,7 +125,6 @@ int main(int argc, const char **argv){
     }
 
     //MONTAGEM DO ARQUIVO OBJETO LIGADO
-
     ofstream arquivo_saida;
 
     arquivo_saida.open(string(argv[1]));
