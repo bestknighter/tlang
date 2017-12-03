@@ -52,10 +52,27 @@ int main( int argc, char* argv[] ) {
 		}
 
 		codeOutput << "H: ";
-		codeOutput << Config::outputFile << "\n";
+		codeOutput << Config::outputFile.substr( Config::outputFile.find_last_of( "/\\" )+1 ) << "\n";
 
 		codeOutput << "H: ";
 		codeOutput << compiledCode.size() << "\n";
+
+		codeOutput << "H: ";
+		codeOutput << s.GetMapaBits() << "\n";
+
+		codeOutput << "TD:";
+		auto TD = s.GetTabelaDefinicao();
+		for( unsigned int i = 0; i < TD.size(); i++ ) {
+			codeOutput << " " << std::get<0>(TD[i]) << " " << std::get<1>(TD[i]);
+		}
+		codeOutput << "\n";
+
+		codeOutput << "TU:";
+		auto TU = s.GetTabelaDefinicao();
+		for( unsigned int i = 0; i < TU.size(); i++ ) {
+			codeOutput << " " << std::get<0>(TU[i]) << " " << std::get<1>(TU[i]);
+		}
+		codeOutput << "\n";
 
 		codeOutput << "T: ";
 		codeOutput << binary << "\n";

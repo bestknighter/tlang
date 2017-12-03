@@ -22,7 +22,9 @@ class Semantico {
 		bool PassagemZero( std::vector< Expression >& preproCode); // Recebe lista de Expressoes e faz o pré-processamento sobre eles. Retorna se é o código é válido.
 		std::vector< int > PassagemUnica( std::vector< Expression >& code ); // Recebe lista de Expressoes já pré-processadas (com seção DATA após a seção TEXT, por exemplo)
 																	  // e retorna um vetor com os valores do código objeto
-		std::vector< std::tuple< std::string, int > > GetTabelaDefinicao();
+		std::vector< std::tuple< std::string, unsigned int > > GetTabelaDefinicao(); // Retorna todos do Symbols que sao PUBLIC
+		std::vector< std::tuple< std::string, unsigned int > > GetTabelaUso(); // Retorna todos do Symbols que sao EXTERN
+		std::string GetMapaBits(); // Retorna o mapa de bits
 	private:
 		Semantico();
 		static Semantico* instance;
@@ -43,8 +45,11 @@ class Semantico {
 		std::map< std::string, bool > textLabels; // Temp pra deteccao de erros na primeira passagem (bool é dummy)
 							//	pos, offset
 		std::vector< std::tuple< int, int > > offsets; // Temp para fazer offsets corretamente
-										// Endereço   , def, const, lista
-		std::map< std::string, std::tuple< unsigned int, bool, bool, int > > Symbols;
+										// Endereço   , def, const, lista, ext, public
+		std::map< std::string, std::tuple< unsigned int, bool, bool, int, bool, bool > > Symbols;
+		std::vector< std::tuple< std::string, unsigned int > > TabelaDefinicao;
+		std::vector< std::tuple< std::string, unsigned int > > TabelaUso;
+		std::string MapaBits;
 };
 
 #endif // SEMANTICO_HPP
