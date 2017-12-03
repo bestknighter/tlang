@@ -17,9 +17,12 @@ class Semantico {
 	public:
 		static Semantico& GetInstance();
 
+		void Reset(); // Limpa todas as tabelas para refazer o processo
+
 		bool PassagemZero( std::vector< Expression >& preproCode); // Recebe lista de Expressoes e faz o pré-processamento sobre eles. Retorna se é o código é válido.
-		std::string PassagemUnica( std::vector< Expression >& code ); // Recebe lista de Expressoes já pré-processadas (com seção DATA após a seção TEXT, por exemplo)
-																	  // e retorna uma string com os valores em decimal já do código objeto
+		std::vector< int > PassagemUnica( std::vector< Expression >& code ); // Recebe lista de Expressoes já pré-processadas (com seção DATA após a seção TEXT, por exemplo)
+																	  // e retorna um vetor com os valores do código objeto
+		std::vector< std::tuple< std::string, int > > GetTabelaDefinicao();
 	private:
 		Semantico();
 		static Semantico* instance;

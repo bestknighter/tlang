@@ -23,6 +23,18 @@ Semantico& Semantico::GetInstance() {
 	return *instance;
 }
 
+void Semantico::Reset() {
+	p.Reset();
+	currentSection = CurrentSection::NONE ;
+	macroStart = -1;
+	EQUs.clear();
+	Macros.clear();
+	dataLabels.clear();
+	textLabels.clear();
+	offsets.clear();
+	Symbols.clear();
+}
+
 bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 	std::array< std::vector< Expression >, 2 > preprocessedCode; // 0 = TEXT, 1 = DATA
 	// Para facilitar colocar a seção DATA no final do código objeto
@@ -178,22 +190,16 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 				Error::Semantico( "Essa instrucao somente e valida na secao texto.", e, 1, std::string( e ).size() );
 				validCode = false;
 			}
-			if( 2 <= Config::numSteps ) {
-				try { // Expansao de macros
-					auto bounds = Macros.at( e.GetOperation() );
-					for( unsigned int i = std::get<0>(bounds); i < std::get<1>(bounds); i++ ) {
-						preprocessedCode[currentSection].push_back( preprocessedCode[currentSection][i] );
-					}
-				} catch( std::out_of_range &err ) {
-					int column = e.GetLabel().size();
-					column += 2*(column>0) + 1;
-					Error::Semantico( "Instrucao, diretiva ou macro nao reconhecida.", e, column, column+e.GetOperation().size()-1 );
-					validCode = false;
+			try { // Expansao de macros
+				auto bounds = Macros.at( e.GetOperation() );
+				for( unsigned int i = std::get<0>(bounds); i < std::get<1>(bounds); i++ ) {
+					preprocessedCode[currentSection].push_back( preprocessedCode[currentSection][i] );
 				}
-			} else {
-				if( CurrentSection::NONE != currentSection ){
-					preprocessedCode[currentSection].push_back( e );
-				}
+			} catch( std::out_of_range &err ) {
+				int column = e.GetLabel().size();
+				column += 2*(column>0) + 1;
+				Error::Semantico( "Instrucao, diretiva ou macro nao reconhecida.", e, column, column+e.GetOperation().size()-1 );
+				validCode = false;
 			}
 		}
 	} while( !eof );
@@ -209,7 +215,7 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 	return validCode;
 }
 
-std::string Semantico::PassagemUnica( std::vector< Expression >& code ) {
+std::vector< int > Semantico::PassagemUnica( std::vector< Expression >& code ) {
 	std::vector< int > finalCode;
 	currentSection = CurrentSection::NONE;
 	bool validCode = true;
@@ -390,14 +396,7 @@ std::string Semantico::PassagemUnica( std::vector< Expression >& code ) {
 			finalCode[std::get<0>(offsets[i])] += std::get<1>(offsets[i]);
 		}
 	
-		// E gere a string
-		std::string binary = std::to_string( finalCode[0] );
-		for(unsigned int i = 1; i < finalCode.size(); i++ ) {
-			binary += " ";
-			binary += std::to_string( finalCode[i] );
-		}
-	
-		return binary;
+		return finalCode;
 	} else {
 		std::cout << "Codigo invalido. Codigo objeto nao gerado.\n";
 		std::exit( EXIT_FAILURE );

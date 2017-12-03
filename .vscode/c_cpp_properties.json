@@ -5,7 +5,10 @@
             "includePath": [
                 "/usr/include",
                 "/usr/local/include",
-                "${workspaceRoot}"
+                "${workspaceRoot}",
+                "${workspaceRoot}/montador/include",
+                "${workspaceRoot}/ligador/include",
+                "${workspaceRoot}/carregador/include"
             ],
             "defines": [],
             "intelliSenseMode": "clang-x64",
@@ -28,7 +31,10 @@
             "includePath": [
                 "/usr/include",
                 "/usr/local/include",
-                "${workspaceRoot}"
+                "${workspaceRoot}",
+                "${workspaceRoot}/montador/include",
+                "${workspaceRoot}/ligador/include",
+                "${workspaceRoot}/carregador/include"
             ],
             "defines": [],
             "intelliSenseMode": "clang-x64",
@@ -46,14 +52,15 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceRoot}",
-                "${workspaceRoot}/include",
-                "C:/msys64/mingw64/x86_64-w64-mingw32/include"
+                "${workspaceRoot}/montador/include",
+                "${workspaceRoot}/ligador/include",
+                "${workspaceRoot}/carregador/include"
             ],
             "defines": [
                 "_DEBUG",
                 "UNICODE"
             ],
-            "intelliSenseMode": "msvc-x64",
+            "intelliSenseMode": "clang-x64",
             "browse": {
                 "path": [
                     "${workspaceRoot}",
