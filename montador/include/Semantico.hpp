@@ -25,6 +25,8 @@ class Semantico {
 		std::vector< std::tuple< std::string, unsigned int > > GetTabelaDefinicao(); // Retorna todos do Symbols que sao PUBLIC
 		std::vector< std::tuple< std::string, unsigned int > > GetTabelaUso(); // Retorna todos do Symbols que sao EXTERN
 		std::string GetMapaBits(); // Retorna o mapa de bits
+		bool GetTeveBegin();
+		bool GetTeveEnd();
 	private:
 		Semantico();
 		static Semantico* instance;
@@ -50,6 +52,8 @@ class Semantico {
 		std::vector< std::tuple< std::string, unsigned int > > TabelaDefinicao;
 		std::vector< std::tuple< std::string, unsigned int > > TabelaUso;
 		std::string MapaBits;
+		bool teveBegin;
+		bool teveEnd;
 };
 
 #endif // SEMANTICO_HPP

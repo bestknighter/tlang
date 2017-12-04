@@ -75,7 +75,7 @@ bool Scanner::GetNextToken( Token& nextToken ) {
 		Error::Lexico( "Token mal-formado.", nextToken );
 	}
 
-	if( file.eof() && 0 == line.size() ) return true; // Não tem mais o que processar
+	if( file.eof() && 0 == line.size() && token.size() == 0 ) return true; // Não tem mais o que processar
 	return false; // Ainda tem coisa pra processar
 }
 

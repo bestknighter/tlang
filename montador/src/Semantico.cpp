@@ -33,7 +33,11 @@ void Semantico::Reset() {
 	textLabels.clear();
 	offsets.clear();
 	Symbols.clear();
+	TabelaDefinicao.clear();
+	TabelaUso.clear();
 	MapaBits = "";
+	teveBegin = false;
+	teveEnd = false;
 }
 
 bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
@@ -61,8 +65,11 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 				}
 				case 2: { // SPACE mas so verifica se a label ja existe e se esta na secao certa
 					if( LabelExists( e.GetLabel() ) ) {
-						Error::Semantico( "Esta label ja foi previamente definida.", e, 1, e.GetLabel().size() );
-						validCode = false;
+						auto value = Symbols[e.GetLabel()];
+						if( std::get<1>(value) ) { // Label foi definida
+							Error::Semantico( "Esta label ja foi previamente definida.", e, 1, e.GetLabel().size() );
+							validCode = false;
+						}
 					}
 					// Anotando a existência dessa label
 					if( !LabelExists( e.GetLabel(), dataLabels ) ) {
@@ -79,8 +86,11 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 				}
 				case 3: { // CONST mas so verifica se a label ja existe e se esta na secao certa
 					if( LabelExists( e.GetLabel() ) ) {
-						Error::Semantico( "Esta label ja foi previamente definida.", e, 1, e.GetLabel().size() );
-						validCode = false;
+						auto value = Symbols[e.GetLabel()];
+						if( std::get<1>(value) ) { // Label foi definida
+							Error::Semantico( "Esta label ja foi previamente definida.", e, 1, e.GetLabel().size() );
+							validCode = false;
+						}
 					}
 					// Anotando a existência dessa label
 					if( !LabelExists( e.GetLabel(), dataLabels ) ) {
@@ -174,12 +184,21 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 						Symbols[e.GetOperands()[0]] = {0, false, true, -1, false, true}; // Se PUBLIC, nao pode ser EXTERN
 					} else { // Label ja existe
 						auto value = Symbols[e.GetOperands()[0]];
-						Symbols[e.GetOperands()[0]] = {std::get<0>(value), std::get<0>(value), std::get<0>(value), std::get<0>(value), false, true}; // Se PUBLIC, nao pode ser EXTERN
+						Symbols[e.GetOperands()[0]] = {std::get<0>(value), std::get<1>(value), std::get<2>(value), std::get<3>(value), false, true}; // Se PUBLIC, nao pode ser EXTERN
 					}
+					continue;
+				}
+				case 10: {
+					preprocessedCode[CurrentSection::TEXT].push_back(e);
+					continue;
+				}
+				case 11: {
+					preprocessedCode[CurrentSection::DATA].push_back(e);
 					continue;
 				}
 				default: { // Diretiva que só se executa na passagem única
 					preprocessedCode[currentSection].push_back(e);
+					continue;
 				}
 			}
 		} else if( Instruction::Validate( e ) ) {
@@ -301,9 +320,37 @@ std::vector< int > Semantico::PassagemUnica( std::vector< Expression >& code ) {
 				MapaBits += "0";
 				continue;
 			}
-			// TODO: BEGIN END
-			// BEGIN tem que ser primeira linha do arquivo e gera simbolo com endereco 0
-			// END tem que ser ultima linha do arquivo
+			case 10: { // BEGIN
+				if( 0 != i ) {
+					Error::Semantico( "BEGIN deve ser a primeira linha do codigo.", code[i], 1, std::string( code[i] ).size() );
+				} else if ( !LabelExists( code[i].GetLabel() ) ) { // Label nao existia
+					Symbols[code[i].GetLabel()] = {0, true, true, -1, false, false};
+				} else {
+					auto value = Symbols[code[i].GetLabel()];
+					if( !std::get<1>(value) ) { // Label so foi referenciado
+						int next = std::get<3>(value);
+						while( next != -1 ) {
+							int aux = finalCode[next];
+							finalCode[next] = 0;
+							next = aux;
+						}
+						Symbols[code[i].GetLabel()] = {0, true, true, -1, std::get<4>(value), std::get<5>(value)};
+					} else { // Label ja foi declarado
+						Error::Semantico( "Label ja foi previamente declarado.", code[i], 1, code[i].GetLabel().size() );
+						validCode = false;
+					}
+				}
+				teveBegin = true;
+				continue;
+			}
+			case 11: { // END
+				if( code.size()-1 != i ) {
+					Error::Semantico( "END deve ser a ultima linha do codigo.", code[i], 1, std::string( code[i] ).size() );
+					validCode = false;
+				}
+				teveEnd = true;
+				continue;
+			}
 		}
 
 		if( 0 < code[i].GetLabel().size() ) { // Tem label
@@ -454,8 +501,17 @@ std::vector< std::tuple< std::string, unsigned int > > Semantico::GetTabelaDefin
 std::vector< std::tuple< std::string, unsigned int > > Semantico::GetTabelaUso() {
 	return TabelaUso;
 }
+
 std::string Semantico::GetMapaBits() {
 	return MapaBits;
+}
+
+bool Semantico::GetTeveBegin() {
+	return teveBegin;
+}
+
+bool Semantico::GetTeveEnd() {
+	return teveEnd;
 }
 
 bool Semantico::LabelExists( std::string label, auto map ) {

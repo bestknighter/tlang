@@ -45,6 +45,21 @@ int main( int argc, char* argv[] ) {
 
 		std::vector< int > compiledCode = s.PassagemUnica( code );
 
+		if( 2 < argc ) {
+			bool fail = false;
+			if( !s.GetTeveBegin() ) {
+				std::cerr << "Nao foi possivel encontrar a diretiva BEGIN no arquivo " << Config::inputFile << ".\n";
+				fail |= true;
+			}
+			if( !s.GetTeveEnd() ) {
+				std::cerr << "Nao foi possivel encontrar a diretiva END no arquivo " << Config::inputFile << ".\n";
+				fail |= true;
+			}
+			if( fail ) {
+				return EXIT_FAILURE;
+			}
+		}
+
 		std::string binary = std::to_string( compiledCode[0] );
 		for(unsigned int i = 1; i < compiledCode.size(); i++ ) {
 			binary += " ";
@@ -68,7 +83,7 @@ int main( int argc, char* argv[] ) {
 		codeOutput << "\n";
 
 		codeOutput << "TU:";
-		auto TU = s.GetTabelaDefinicao();
+		auto TU = s.GetTabelaUso();
 		for( unsigned int i = 0; i < TU.size(); i++ ) {
 			codeOutput << " " << std::get<0>(TU[i]) << " " << std::get<1>(TU[i]);
 		}
