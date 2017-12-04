@@ -42,8 +42,7 @@ class Semantico {
 		int macroStart; // Temp para armazenar a linha onde a macro começou a ser definida.
 		std::map< std::string, int > EQUs; // Armazena todos os sinônimos declarados.
 		std::map< std::string, std::tuple< unsigned int, unsigned int > > Macros; // Armazena o começo e o fim das macros declaradas.
-							// const
-		std::map< std::string, bool > dataLabels; // Temp pra deteccao de erros na primeira passagem
+		std::map< std::string, bool > dataLabels; // Temp pra deteccao de erros na primeira passagem (bool eh const)
 		std::map< std::string, bool > textLabels; // Temp pra deteccao de erros na primeira passagem (bool é dummy)
 							//	pos, offset
 		std::vector< std::tuple< int, int > > offsets; // Temp para fazer offsets corretamente

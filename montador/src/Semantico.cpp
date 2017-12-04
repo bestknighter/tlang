@@ -169,9 +169,9 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 				}
 				case 8: { // EXTERN
 					if( !LabelExists( e.GetLabel() ) ) { // Label nao existia
-						Symbols[e.GetLabel()] = {0, false, true, -1, true, false}; // Se EXTERN, nao pode ser PUBLIC
+						Symbols[e.GetLabel()] = {0, false, false, -1, true, false}; // Se EXTERN, nao pode ser PUBLIC
 						// Nao se sabe se eh data ou text, mas pode ser ambos
-						dataLabels[e.GetLabel()] = true;
+						dataLabels[e.GetLabel()] = false;
 						textLabels[e.GetLabel()] = true;
 					} else { // Label ja existe
 						Error::Semantico( "Label ja foi previamente declarado. Tem certeza que ele eh EXTERN?", e, 1, e.GetLabel().size() );
@@ -181,18 +181,18 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 				}
 				case 9: { // PUBLIC
 					if( !LabelExists( e.GetOperands()[0] ) ) { // Label nao existia
-						Symbols[e.GetOperands()[0]] = {0, false, true, -1, false, true}; // Se PUBLIC, nao pode ser EXTERN
+						Symbols[e.GetOperands()[0]] = {0, false, false, -1, false, true}; // Se PUBLIC, nao pode ser EXTERN
 					} else { // Label ja existe
 						auto value = Symbols[e.GetOperands()[0]];
 						Symbols[e.GetOperands()[0]] = {std::get<0>(value), std::get<1>(value), std::get<2>(value), std::get<3>(value), false, true}; // Se PUBLIC, nao pode ser EXTERN
 					}
 					continue;
 				}
-				case 10: {
+				case 10: { // BEGIN
 					preprocessedCode[CurrentSection::TEXT].push_back(e);
 					continue;
 				}
-				case 11: {
+				case 11: { // END
 					preprocessedCode[CurrentSection::DATA].push_back(e);
 					continue;
 				}
@@ -204,11 +204,6 @@ bool Semantico::PassagemZero( std::vector< Expression >& preproCode) {
 		} else if( Instruction::Validate( e ) ) {
 			if( CurrentSection::TEXT != currentSection ) {
 				Error::Semantico( "Essa instrucao somente e valida na secao texto.", e, 1, std::string( e ).size() );
-				validCode = false;
-			}
-			// Substituindo EQUs
-			if( LabelExists( e.GetLabel() ) ) {
-				Error::Semantico( "Esta label ja foi previamente definida.", e, 1, e.GetLabel().size() );
 				validCode = false;
 			}
 			// Anotando a existência dessa label
@@ -384,7 +379,7 @@ std::vector< int > Semantico::PassagemUnica( std::vector< Expression >& code ) {
 			case 10: // LOAD
 			case 13: { // OUTPUT
 				if( !LabelExists( code[i].GetOperands()[0], dataLabels ) ) {
-					Error::Semantico( "Usado label de texto quando se esperava de data.", code[i], 1, std::string( code[i] ).size() );
+					Error::Semantico( "Label digitada nao eh do tipo data.", code[i], 1, std::string( code[i] ).size() );
 					validCode = false;
 				}
 				break;
@@ -394,7 +389,7 @@ std::vector< int > Semantico::PassagemUnica( std::vector< Expression >& code ) {
 			case 7: // JMPP
 			case 8: { // JMPZ
 				if( !LabelExists( code[i].GetOperands()[0], textLabels ) ) {
-					Error::Semantico( "Usado label de data quando se esperava de texto.", code[i], 1, std::string( code[i] ).size() );
+					Error::Semantico( "Label digitada nao eh do tipo  texto.", code[i], 1, std::string( code[i] ).size() );
 					validCode = false;
 				}
 				break;

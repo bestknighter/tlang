@@ -1,7 +1,9 @@
+BIN: BEGIN
 SECTION TEXT
-INPUT OLD_DATA + 1;teste
+INPUT OLD_DATA;teste
 LOAD OLD_DATA ; teste1, linha em branco abaixo eh proposital
 
+PUBLIC BIN
 ;teste2 com comentario em linha unica
 L1:
 DIV DOIS
@@ -23,3 +25,4 @@ DOIS: CONST 2
 OLD_DATA: SPACE
 NEW_DATA: SPACE
 TMP_DATA: SPACE
+END
