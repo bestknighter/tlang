@@ -21,6 +21,9 @@ int main(int argc, const char * argv[]) {
     std::ifstream input( fileTitle );
     std::string line;
     
+    /**********************************
+     * Obtem informacoes do cabecalho *
+     **********************************/
     std::string nomeArquivo;
     getline( input, line );
     nomeArquivo = line.substr(3,line.length() - line.find("."));
@@ -47,7 +50,9 @@ int main(int argc, const char * argv[]) {
     }
     cout << endl;
     
-    //simulacao
+    /*************
+     * Simulacao *
+     *************/
     cout << "---- Inicio Simulacao:" << endl;
     bool executar = true;
     long pos = 0;
@@ -158,6 +163,9 @@ int main(int argc, const char * argv[]) {
     }
     cout << endl << endl;
     
+    /******************
+     * Calcula chunks *
+     ******************/
     int chunks = std::atoi(argv[2]);
     int tamanhoDisponivelMem = 0;
     int chunkUnica = -1;
@@ -171,6 +179,9 @@ int main(int argc, const char * argv[]) {
   
     std::cout << "Memoria disponivel em bytes para execucao:\t" << tamanhoDisponivelMem << std::endl;
     
+    /******************************************************
+     * Aloca de acordo com o espaco disponivel, se houver *
+     ******************************************************/
     if (tamanhoDisponivelMem >= tamanho) {
         //tudo certo, carregar programa em memoria
         std::string codigoNovo;
@@ -231,7 +242,7 @@ int main(int argc, const char * argv[]) {
             cout << "Codigo apos correcao de enderecos: " << endl << codigoNovo << endl << endl;
             std::ofstream output( fileTitle + ".im" );
             output << codigoNovo;
-
+            output.close();
         }
     }
     else {

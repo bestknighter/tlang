@@ -21,6 +21,7 @@ int main( int argc, char* argv[] ) {
 
 	Semantico& s = Semantico::GetInstance();
 	
+	// Fazer para todos os arquivos passados
 	for (int i = 1; i < argc; i++) {
 		Config::inputFile = argv[i];
 		Config::outputFile = std::string(argv[i]);
@@ -43,8 +44,10 @@ int main( int argc, char* argv[] ) {
 			return 0;
 		}
 
+		// Passagem unica caso tenha dado tudo certo ate o momento
 		std::vector< int > compiledCode = s.PassagemUnica( code );
 
+		// Tem mais de um arquivo? Tem que ter BEGIN e END em todos
 		if( 2 < argc ) {
 			bool fail = false;
 			if( !s.GetTeveBegin() ) {
@@ -60,21 +63,29 @@ int main( int argc, char* argv[] ) {
 			}
 		}
 
+		// STRING(OPCODE) <- INT(OPCODE)
 		std::string binary = std::to_string( compiledCode[0] );
 		for(unsigned int i = 1; i < compiledCode.size(); i++ ) {
 			binary += " ";
 			binary += std::to_string( compiledCode[i] );
 		}
 
+		/*************
+		 * Cabecalho *
+		 *************/
+		// Nome do Arquivo
 		codeOutput << "H: ";
 		codeOutput << Config::outputFile.substr( Config::outputFile.find_last_of( "/\\" )+1 ) << "\n";
 
+		// Tamanho do programa
 		codeOutput << "H: ";
 		codeOutput << compiledCode.size() << "\n";
 
+		// Mapa de Bits
 		codeOutput << "H: ";
 		codeOutput << s.GetMapaBits() << "\n";
 
+		// Tabela de Definicao
 		codeOutput << "TD:";
 		auto TD = s.GetTabelaDefinicao();
 		for( unsigned int i = 0; i < TD.size(); i++ ) {
@@ -82,6 +93,7 @@ int main( int argc, char* argv[] ) {
 		}
 		codeOutput << "\n";
 
+		// Tabela de Uso
 		codeOutput << "TU:";
 		auto TU = s.GetTabelaUso();
 		for( unsigned int i = 0; i < TU.size(); i++ ) {
@@ -89,6 +101,9 @@ int main( int argc, char* argv[] ) {
 		}
 		codeOutput << "\n";
 
+		/**********
+		 * Codigo *
+		 **********/
 		codeOutput << "T: ";
 		codeOutput << binary << "\n";
 		
