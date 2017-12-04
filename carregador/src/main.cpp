@@ -17,7 +17,7 @@ void vetorMemoria(string, int[500], long, int);
 int main(int argc, const char * argv[]) {
     
     std::string fileTitle = argv[1];
-    fileTitle = fileTitle + ".o";
+    // fileTitle = fileTitle + ".o";
     std::ifstream input( fileTitle );
     std::string line;
     
@@ -48,7 +48,7 @@ int main(int argc, const char * argv[]) {
     cout << endl;
     
     //simulacao
-    cout << "---- Início Simulação:" << endl;
+    cout << "---- Inicio Simulacao:" << endl;
     bool executar = true;
     long pos = 0;
     int acumulador = 0;
@@ -147,7 +147,7 @@ int main(int argc, const char * argv[]) {
             }
         }
     }
-    cout << "---- Fim Simulação:" << endl;
+    cout << "---- Fim Simulacao:" << endl;
     
     int chunks = std::atoi(argv[2]);
     int tamanhoDisponivelMem = 0;
@@ -159,7 +159,7 @@ int main(int argc, const char * argv[]) {
             chunkUnica = i;
         }
     }
-    std::cout << "Memória disponível em bytes:\t" << tamanhoDisponivelMem << std::endl;
+    std::cout << "Memoria disponivel em bytes:\t" << tamanhoDisponivelMem << std::endl;
     
     if (tamanhoDisponivelMem >= tamanho) {
         //tudo certo, carregar programa em memoria
@@ -217,7 +217,7 @@ int main(int argc, const char * argv[]) {
                     tamanhoEscrito++;
                 }
             }
-            cout << "Código Final: " << codigoNovo << endl;
+            cout << "Codigo Final: " << codigoNovo << endl;
         }
     }
     else {
