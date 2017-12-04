@@ -16,6 +16,8 @@ class Parser {
 	public:
 		static Parser& GetInstance();
 
+		void Reset(); // Prepara para recomecar
+
 		bool GetNextExpression( Expression& exp ); // Uma expressão é uma partícula lógica de código
 
 		~Parser();

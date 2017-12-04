@@ -33,5 +33,6 @@
 		"sstream": "cpp",
 		"tuple": "cpp",
 		"utility": "cpp"
-	}
+	},
+	"C_Cpp.intelliSenseEngineFallback": "Enabled"
 }
