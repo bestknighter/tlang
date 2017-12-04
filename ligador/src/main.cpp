@@ -15,15 +15,14 @@ int main(int argc, const char **argv){
 
 
     string linha, codigo_completo, mapadebits_completo, mapadebits, tabela_uso_glob, aux_label;
-    char *aux_linha, *nome_arquivo, *label , *aux_pos_label;
-    int cont_linha, tamanho_arquivo, pos_label, fator_correcao=0, num_arquivos=argc-1, i=1;
+    char *aux_linha, *nome_arquivo, *label;
+    int tamanho_arquivo=0, pos_label, fator_correcao=0, num_arquivos=argc-1, i=1;
     bool cabecalho_nome=true, cabecalho_tamanho=false, cabecalho_mapa=false;
     std::unordered_map<std::string,int> tabela_def_glob;
     std::unordered_map<std::string,int>::const_iterator gotLabel;
 
     aux_linha=(char *)malloc(sizeof(char)*200);
     nome_arquivo=(char *)malloc(sizeof(char)*200);
-    aux_pos_label=(char *)malloc(sizeof(char)*200);
     label=(char *)malloc(sizeof(char)*100);
 
 

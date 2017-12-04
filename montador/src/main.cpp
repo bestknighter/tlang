@@ -11,7 +11,7 @@
 
 int main( int argc, char* argv[] ) {
 
-	if( 4 < argc || 1 >= argc ) {
+	if( 1 >= argc ) {
 		std::cerr << "Erro: Numero incorreto de argumentos passados.\n";
 		return EXIT_FAILURE;
 	}

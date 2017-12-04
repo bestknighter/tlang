@@ -147,6 +147,7 @@ int main(int argc, const char * argv[]) {
             }
             else if (opInt == 13) {
                 cout << "OUTPUT. Pos. memoria: " << operandoInt << ", Valor: " << memoria[operandoInt] << endl;
+                cout << memoria[operandoInt] << endl;
             }
         }
     }

@@ -15,10 +15,10 @@ Made by Gabriel Barbosa (12/0050935), Victor de Carvalho (12/0062232) and Adarle
 
 ## Calling instructions
 
-- For calling `montador`, you'll need to pass 1 to 3 `.asm` files. It'll generate one `.o` for each file. Windows example:
+- For calling `montador`, you'll need to pass 1 or more `.asm` files. It'll generate one `.o` for each file. Windows example:
   - `.\montador.exe '.\Arquivos Teste\fat_mod_A.asm' '.\Arquivos Teste\fat_mod_B.asm'`
 
-- For calling `ligador`, you'll need to pass 1 to 3 `.o` files. It'll generate a single file without extension with the same name as the first file. Windows example:
+- For calling `ligador`, you'll need to pass 1 or more `.o` files. It'll generate a single file without extension with the same name as the first file. Windows example:
   - `.\ligador.exe '.\Arquivos Teste\fat_mod_A.o' '.\Arquivos Teste\fat_mod_B.o'`
 
 - For calling `carregador`, you'll need to pass one file without extension followed by memory chunk info. It'll generate a `.im` file. Windows example:
