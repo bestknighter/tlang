@@ -126,9 +126,12 @@ int main(int argc, const char **argv){
 
     //MONTAGEM DO ARQUIVO OBJETO LIGADO
     ofstream arquivo_saida;
-
-    arquivo_saida.open(string(argv[1]));
-    arquivo_saida << "H: " + string(argv[1])+"\n";
+    string nome_arquivo_saida;
+    
+    nome_arquivo_saida=string(argv[1]);
+    nome_arquivo_saida.erase(nome_arquivo_saida.end()-2,nome_arquivo_saida.end()); //Retira extensão .o do primeiro arquivo de entrada.
+    arquivo_saida.open(nome_arquivo_saida);
+    arquivo_saida << "H: " + nome_arquivo_saida +"\n";
     arquivo_saida << "H: " + to_string(fator_correcao) + "\n";
     arquivo_saida << "H: " + mapadebits + "\n";
     arquivo_saida << "T: ";
