@@ -219,7 +219,7 @@ int main(int argc, const char * argv[]) {
             }
             cout << "Codigo Final: " << codigoNovo << endl;
             std::ofstream output( fileTitle + ".im" );
-            output << codigoNovo << endl;
+            output << codigoNovo;
         }
     }
     else {
