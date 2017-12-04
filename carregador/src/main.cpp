@@ -67,12 +67,15 @@ int main(int argc, const char * argv[]) {
             //COPY, dois operandos
             nextPos = codigo.find(" ",pos);
             string operando = codigo.substr(pos,nextPos-pos);
+            int operandoInt = stoi(operando);
             pos = nextPos + 1;
-            cout << "COPY: " << operando << ", ";
+            cout << "COPY: " << memoria[operandoInt] << ", ";
             nextPos = codigo.find(" ",pos);
             operando = codigo.substr(pos,nextPos-pos);
+            int operandoInt2 = stoi(operando);
             pos = nextPos + 1;
-            cout << operando << endl;
+            cout << memoria[operandoInt2] << endl;
+            memoria[operandoInt2] = memoria[operandoInt];
         }
         else {
             //um operando
@@ -147,7 +150,12 @@ int main(int argc, const char * argv[]) {
             }
         }
     }
-    cout << "---- Fim Simulacao:" << endl;
+  
+    cout << "---- Fim Simulacao." << endl << "Espelho de memoria apos execucao:" << endl;
+    for (int i = 0; i < tamanho; i++) {
+        cout << memoria[i] << " ";
+    }
+    cout << endl << endl;
     
     int chunks = std::atoi(argv[2]);
     int tamanhoDisponivelMem = 0;
@@ -159,7 +167,8 @@ int main(int argc, const char * argv[]) {
             chunkUnica = i;
         }
     }
-    std::cout << "Memoria disponivel em bytes:\t" << tamanhoDisponivelMem << std::endl;
+  
+    std::cout << "Memoria disponivel em bytes para execucao:\t" << tamanhoDisponivelMem << std::endl;
     
     if (tamanhoDisponivelMem >= tamanho) {
         //tudo certo, carregar programa em memoria
@@ -217,9 +226,11 @@ int main(int argc, const char * argv[]) {
                     tamanhoEscrito++;
                 }
             }
-            cout << "Codigo Final: " << codigoNovo << endl;
+          
+            cout << "Codigo apos correcao de enderecos: " << endl << codigoNovo << endl << endl;
             std::ofstream output( fileTitle + ".im" );
             output << codigoNovo;
+
         }
     }
     else {
@@ -249,4 +260,3 @@ size_t find_nth(const string& texto, size_t pos, const string& needle, size_t nt
     if(0 == nth || string::npos == found_pos)  return found_pos;
     return find_nth(texto, found_pos+1, needle, nth-1);
 }
-

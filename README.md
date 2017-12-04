@@ -3,7 +3,7 @@
 
 Developed for Windows 10 x64 but with Linux compatiblity (not tested) in mind.
 
-Made by Gabriel Barbosa (12/0050935), Vitor XXXXXX (XX/XXXXXXX) and Adarley Grando (XX/XXXXXXX)
+Made by Gabriel Barbosa (12/0050935), Vitor XXXXXX (XX/XXXXXXX) and Adarley Grando (11/0007344)
 
 #### Compilation instructions
 
