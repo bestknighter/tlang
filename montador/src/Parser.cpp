@@ -37,19 +37,21 @@ Parser& Parser::GetInstance() {
 bool Parser::GetNextExpression( Expression& exp ) {
 	std::vector< Token > tokens;
 	
-	if( nextToken->GetLine() == lineBeingProcessed ) {
-		tokens.push_back( *nextToken );
-	}
-	do { // Obtem todos os tokens da mesma linha
-		eof = s.GetNextToken( *nextToken );
+	do {
 		if( nextToken->GetLine() == lineBeingProcessed ) {
 			tokens.push_back( *nextToken );
-		} else {
-			break;
 		}
-	} while( !eof );
+		do { // Obtem todos os tokens da mesma linha
+			eof = s.GetNextToken( *nextToken );
+			if( nextToken->GetLine() == lineBeingProcessed ) {
+				tokens.push_back( *nextToken );
+			} else {
+				break;
+			}
+		} while( !eof );
 
-	lineBeingProcessed = nextToken->GetLine();
+		lineBeingProcessed = nextToken->GetLine();
+	} while( 0 >= tokens.size() && !eof );
 
 	exp = CreateExpression( tokens );
 	if( 0 < exp.GetLabel().size() && 0 == exp.GetOperation().size() ) { // Caso seja só um label sozinho

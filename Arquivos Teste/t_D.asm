@@ -1,3 +1,5 @@
+; Esse programa pega a largura e altura obtida por t_B e t_C
+; e calcula a area dos retangulos
 T_D: BEGIN
 SECTION TEXT
 	PUBLIC T_D
@@ -14,7 +16,7 @@ SECTION TEXT
 	LOAD VEC2W
 	MULT VEC2H
 	STORE VEC2A
-	JMP FIM
+	JMP FIM ; Retorna para o arquivo principal para comparar a area
 SECTION DATA
 	VEC1A: SPACE
 	VEC2A: SPACE

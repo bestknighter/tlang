@@ -8,17 +8,17 @@
 
 #include <iostream>
 #include <fstream>
+#include <string>
 
-using namespace std;
-
-size_t find_nth(const string&, size_t, const string&, size_t);
-void vetorMemoria(string, int[500], long, int);
+size_t find_nth(const std::string&, size_t, const std::string&, size_t);
+void vetorMemoria(std::string, int[500], long, int);
 
 int main(int argc, const char * argv[]) {
     
     std::string fileTitle = argv[1];
     // fileTitle = fileTitle + ".o";
-    std::ifstream input( fileTitle );
+    std::ifstream input;
+    input.open( fileTitle.c_str() );
     std::string line;
     
     /**********************************
@@ -41,127 +41,129 @@ int main(int argc, const char * argv[]) {
     std::string codigo = line.substr(3);
     //std::cout << "Código Inicial: " << codigo << std::endl;
     
+    input.close();
+
     //carregar valores dos enderecos do programa para um vetor
     int memoria[500] = {0};
-    cout << "Vetor carregado: ";
+    std::cout << "Vetor carregado: ";
     vetorMemoria(codigo, memoria, 0, 0);
     for (int i = 0; i < tamanho; i++) {
-        cout << memoria[i] << " ";
+        std::cout << memoria[i] << " ";
     }
-    cout << endl;
+    std::cout << std::endl;
     
     /*************
      * Simulacao *
      *************/
-    cout << "---- Inicio Simulacao:" << endl;
+    std::cout << "---- Inicio Simulacao:" << std::endl;
     bool executar = true;
     long pos = 0;
     int acumulador = 0;
     while (executar) {
         //tratar operando
-        string op;
+        std::string op;
         long nextPos = codigo.find(" ",pos);
         op = codigo.substr(pos,nextPos-pos);
         pos = nextPos + 1;
-        int opInt = stoi(op);
+        int opInt = std::stoi(op);
         if (opInt == 14) {
-            cout << "STOP." << endl;
+            std::cout << "STOP." << std::endl;
             executar = false;
         }
         else if (opInt == 9) {
             //COPY, dois operandos
             nextPos = codigo.find(" ",pos);
-            string operando = codigo.substr(pos,nextPos-pos);
-            int operandoInt = stoi(operando);
+            std::string operando = codigo.substr(pos,nextPos-pos);
+            int operandoInt = std::stoi(operando);
             pos = nextPos + 1;
-            cout << "COPY: " << memoria[operandoInt] << ", ";
+            std::cout << "COPY: " << memoria[operandoInt] << ", ";
             nextPos = codigo.find(" ",pos);
             operando = codigo.substr(pos,nextPos-pos);
-            int operandoInt2 = stoi(operando);
+            int operandoInt2 = std::stoi(operando);
             pos = nextPos + 1;
-            cout << memoria[operandoInt2] << endl;
+            std::cout << memoria[operandoInt2] << std::endl;
             memoria[operandoInt2] = memoria[operandoInt];
         }
         else {
             //um operando
             nextPos = codigo.find(" ",pos);
-            string operando = codigo.substr(pos,nextPos-pos);
+            std::string operando = codigo.substr(pos,nextPos-pos);
             pos = nextPos + 1;
-            int operandoInt = stoi(operando);
+            int operandoInt = std::stoi(operando);
             
             if (opInt == 1) {
-                cout << "ADD. MEM[OP]: " << memoria[operandoInt] << ", Acumulador: " << acumulador;
+                std::cout << "ADD. MEM[OP]: " << memoria[operandoInt] << ", Acumulador: " << acumulador;
                 acumulador += memoria[operandoInt];
-                cout << ", Resultado: " << acumulador << endl;
+                std::cout << ", Resultado: " << acumulador << std::endl;
             }
             else if (opInt == 2) {
-                cout << "SUB. MEM[OP]: " << memoria[operandoInt] << ", Acumulador: " << acumulador;
+                std::cout << "SUB. MEM[OP]: " << memoria[operandoInt] << ", Acumulador: " << acumulador;
                 acumulador = acumulador - memoria[operandoInt];
-                cout << ", Resultado: " << acumulador << endl;
+                std::cout << ", Resultado: " << acumulador << std::endl;
             }
             else if (opInt == 3) {
-                cout << "MULT. MEM[OP]: " << memoria[operandoInt] << ", Acumulador: " << acumulador;
+                std::cout << "MULT. MEM[OP]: " << memoria[operandoInt] << ", Acumulador: " << acumulador;
                 acumulador = acumulador * memoria[operandoInt];
-                cout << ", Resultado: " << acumulador << endl;
+                std::cout << ", Resultado: " << acumulador << std::endl;
             }
             else if (opInt == 4) {
-                cout << "DIV. MEM[OP]: " << memoria[operandoInt] << ", Acumulador: " << acumulador;
+                std::cout << "DIV. MEM[OP]: " << memoria[operandoInt] << ", Acumulador: " << acumulador;
                 acumulador = acumulador / memoria[operandoInt];
-                cout << ", Resultado: " << acumulador << endl;
+                std::cout << ", Resultado: " << acumulador << std::endl;
             }
             else if (opInt == 5) {
                 long posicaoJmp = find_nth(codigo, 0, " ", operandoInt-1);
-                cout << "JMP. Operando: " << operandoInt << endl;
+                std::cout << "JMP. Operando: " << operandoInt << std::endl;
                 pos = posicaoJmp+1;
             }
             else if (opInt == 6) {
                 if (acumulador < 0) {
                     long posicaoJmp = find_nth(codigo, 0, " ", operandoInt-1);
-                    cout << "JMPN. Operando: " << operandoInt << endl;
+                    std::cout << "JMPN. Operando: " << operandoInt << std::endl;
                     pos = posicaoJmp+1;
                 }
             }
             else if (opInt == 7) {
                 if (acumulador > 0) {
                     long posicaoJmp = find_nth(codigo, 0, " ", operandoInt-1);
-                    cout << "JMPP. Operando: " << operandoInt << endl;
+                    std::cout << "JMPP. Operando: " << operandoInt << std::endl;
                     pos = posicaoJmp+1;
                 }
             }
             else if (opInt == 8) {
                 if (acumulador == 0) {
                     long posicaoJmp = find_nth(codigo, 0, " ", operandoInt-1);
-                    cout << "JMPZ. Operando: " << operandoInt << endl;
+                    std::cout << "JMPZ. Operando: " << operandoInt << std::endl;
                     pos = posicaoJmp+1;
                 }
             }
             else if (opInt == 10) {
                 acumulador = memoria[operandoInt];
-                cout << "LOAD. Pos. memoria: " << operandoInt << ", Valor: " << acumulador << endl;
+                std::cout << "LOAD. Pos. memoria: " << operandoInt << ", Valor: " << acumulador << std::endl;
             }
             else if (opInt == 11) {
                 memoria[operandoInt] = acumulador;
-                cout << "STORE. Pos. memoria: " << operandoInt << ", Valor: " << acumulador << endl;
+                std::cout << "STORE. Pos. memoria: " << operandoInt << ", Valor: " << acumulador << std::endl;
             }
             else if (opInt == 12) {
-                cout << "INPUT. Entre com valor: ";
-                string textoInput;
-                cin >> textoInput;
-                cout << "Pos. memoria: " << operandoInt << ", Valor: " << textoInput << endl;
-                memoria[operandoInt] = stoi(textoInput);
+                std::cout << "INPUT. Entre com valor: ";
+                std::string textoInput;
+                std::cin >> textoInput;
+                std::cout << "Pos. memoria: " << operandoInt << ", Valor: " << textoInput << std::endl;
+                memoria[operandoInt] = std::stoi(textoInput);
             }
             else if (opInt == 13) {
-                cout << "OUTPUT. Pos. memoria: " << operandoInt << ", Valor: " << memoria[operandoInt] << endl;
-                cout << memoria[operandoInt] << endl;
+                std::cout << "OUTPUT. Pos. memoria: " << operandoInt << ", Valor: " << memoria[operandoInt] << std::endl;
+                std::cout << memoria[operandoInt] << std::endl;
             }
         }
     }
   
-    cout << "---- Fim Simulacao." << endl << "Espelho de memoria apos execucao:" << endl;
+    std::cout << "---- Fim Simulacao." << std::endl << "Espelho de memoria apos execucao:" << std::endl;
     for (int i = 0; i < tamanho; i++) {
-        cout << memoria[i] << " ";
+        std::cout << memoria[i] << " ";
     }
-    cout << endl << endl;
+    std::cout << std::endl << std::endl;
     
     /******************
      * Calcula chunks *
@@ -170,7 +172,7 @@ int main(int argc, const char * argv[]) {
     int tamanhoDisponivelMem = 0;
     int chunkUnica = -1;
     for (int i = 0; i < chunks; i++) {
-        int valor = atoi(argv[3+i]);
+        int valor = std::atoi(argv[3+i]);
         tamanhoDisponivelMem += valor;
         if (valor >= tamanho) {
             chunkUnica = i;
@@ -187,60 +189,61 @@ int main(int argc, const char * argv[]) {
         std::string codigoNovo;
         if (chunkUnica > 0) {
             //programa pode ser alocado em um chunk
-            int enderecoIn = atoi(argv[3+chunks+chunkUnica]);
+            int enderecoIn = std::atoi(argv[3+chunks+chunkUnica]);
             for (int i = 0; i < tamanho; i++) {
                 size_t strInicio;
                 if(i > 0) strInicio = find_nth(codigo, 0, " ", i-1)+1;
                 else strInicio = 0;
                 size_t strFim = find_nth(codigo, 0, " ", i);
-                if (strFim == string::npos) {
+                if (strFim == std::string::npos) {
                     strFim = codigo.length();
                 }
-                int valor = stoi(codigo.substr(strInicio, strFim - strInicio));
+                int valor = std::stoi(codigo.substr(strInicio, strFim - strInicio));
                 if (mapaBitsRel[i] == '1') {
                     //realocar endereco relativo
                     valor = valor + enderecoIn;
                 }
                 if (i > 0) {
-                    codigoNovo = codigoNovo + " " + to_string(valor);
+                    codigoNovo = codigoNovo + " " + std::to_string(valor);
                 }
                 else {
-                    codigoNovo = to_string(valor);
+                    codigoNovo = std::to_string(valor);
                 }
             }
-            cout << codigoNovo;
+            std::cout << codigoNovo;
         }
         else {
             //programa tem que ser dividido em chunks
             int tamanhoEscrito = 0;
             for (int chunkAtual = 0; chunkAtual < chunks && tamanhoEscrito < tamanho; chunkAtual++) {
-                int tamanhoChunkAtual = atoi(argv[3+chunkAtual]);
-                int enderecoIn = atoi(argv[3+chunks+chunkAtual]);
+                int tamanhoChunkAtual = std::atoi(argv[3+chunkAtual]);
+                int enderecoIn = std::atoi(argv[3+chunks+chunkAtual]);
                 for (int tamanhoChunkPreenchido = 0; tamanhoChunkPreenchido < tamanhoChunkAtual && tamanhoEscrito < tamanho; tamanhoChunkPreenchido++) {
                     size_t strInicio;
                     if(tamanhoEscrito > 0) strInicio = find_nth(codigo, 0, " ", tamanhoEscrito-1)+1;
                     else strInicio = 0;
                     size_t strFim = find_nth(codigo, 0, " ", tamanhoEscrito);
-                    if (strFim == string::npos) {
+                    if (strFim == std::string::npos) {
                         strFim = codigo.length();
                     }
-                    int valor = stoi(codigo.substr(strInicio, strFim - strInicio));
+                    int valor = std::stoi(codigo.substr(strInicio, strFim - strInicio));
                     if (mapaBitsRel[tamanhoEscrito] == '1') {
                         //realocar endereco relativo
                         valor = valor + enderecoIn;
                     }
                     if (tamanhoEscrito > 0) {
-                        codigoNovo = codigoNovo + " " + to_string(valor);
+                        codigoNovo = codigoNovo + " " + std::to_string(valor);
                     }
                     else {
-                        codigoNovo = to_string(valor);
+                        codigoNovo = std::to_string(valor);
                     }
                     tamanhoEscrito++;
                 }
             }
           
-            cout << "Codigo apos correcao de enderecos: " << endl << codigoNovo << endl << endl;
-            std::ofstream output( fileTitle + ".im" );
+            std::cout << "Codigo apos correcao de enderecos: " << std::endl << codigoNovo << std::endl << std::endl;
+            std::ofstream output;
+            output.open( (fileTitle + ".im").c_str() );
             output << codigoNovo;
             output.close();
         }
@@ -253,22 +256,22 @@ int main(int argc, const char * argv[]) {
     return 0;
 }
 
-void vetorMemoria(string codigo, int vetor[500], long pos, int pc) {
+void vetorMemoria(std::string codigo, int vetor[500], long pos, int pc) {
     size_t nextPos = codigo.find(" ",pos);
-    if(string::npos == nextPos) {
+    if(std::string::npos == nextPos) {
         //nao encontrou mais
         return;
     }
-    string op = codigo.substr(pos,nextPos-pos);
-    vetor[pc] = stoi(op);
+    std::string op = codigo.substr(pos,nextPos-pos);
+    vetor[pc] = std::stoi(op);
     pc += 1;
     pos = nextPos + 1;
     vetorMemoria(codigo, vetor, pos, pc);
 }
 
-size_t find_nth(const string& texto, size_t pos, const string& needle, size_t nth)
+size_t find_nth(const std::string& texto, size_t pos, const std::string& needle, size_t nth)
 {
     size_t found_pos = texto.find(needle, pos);
-    if(0 == nth || string::npos == found_pos)  return found_pos;
+    if(0 == nth || std::string::npos == found_pos)  return found_pos;
     return find_nth(texto, found_pos+1, needle, nth-1);
 }
