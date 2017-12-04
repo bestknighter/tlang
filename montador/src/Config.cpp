@@ -3,4 +3,4 @@
 std::string Config::inputFile = "";
 std::string Config::outputFile = "";
 std::string Config::ext = "";
-int Config::numSteps = 0;
+bool Config::beginEndRequired = true;

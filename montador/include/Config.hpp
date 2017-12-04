@@ -13,7 +13,7 @@ struct Config {
 		static std::string inputFile;
 		static std::string outputFile;
 		static std::string ext;
-		static int numSteps;
+		static bool beginEndRequired;
 };
 
 #endif // CONFIG_HPP

@@ -17,9 +17,16 @@ class Semantico {
 	public:
 		static Semantico& GetInstance();
 
+		void Reset(); // Limpa todas as tabelas para refazer o processo
+
 		bool PassagemZero( std::vector< Expression >& preproCode); // Recebe lista de Expressoes e faz o pré-processamento sobre eles. Retorna se é o código é válido.
-		std::string PassagemUnica( std::vector< Expression >& code ); // Recebe lista de Expressoes já pré-processadas (com seção DATA após a seção TEXT, por exemplo)
-																	  // e retorna uma string com os valores em decimal já do código objeto
+		std::vector< int > PassagemUnica( std::vector< Expression >& code ); // Recebe lista de Expressoes já pré-processadas (com seção DATA após a seção TEXT, por exemplo)
+																	  // e retorna um vetor com os valores do código objeto
+		std::vector< std::tuple< std::string, unsigned int > > GetTabelaDefinicao(); // Retorna todos do Symbols que sao PUBLIC
+		std::vector< std::tuple< std::string, unsigned int > > GetTabelaUso(); // Retorna todos do Symbols que sao EXTERN
+		std::string GetMapaBits(); // Retorna o mapa de bits
+		bool GetTeveBegin();
+		bool GetTeveEnd();
 	private:
 		Semantico();
 		static Semantico* instance;
@@ -35,13 +42,17 @@ class Semantico {
 		int macroStart; // Temp para armazenar a linha onde a macro começou a ser definida.
 		std::map< std::string, int > EQUs; // Armazena todos os sinônimos declarados.
 		std::map< std::string, std::tuple< unsigned int, unsigned int > > Macros; // Armazena o começo e o fim das macros declaradas.
-							// const
-		std::map< std::string, bool > dataLabels; // Temp pra deteccao de erros na primeira passagem
+		std::map< std::string, bool > dataLabels; // Temp pra deteccao de erros na primeira passagem (bool eh const)
 		std::map< std::string, bool > textLabels; // Temp pra deteccao de erros na primeira passagem (bool é dummy)
 							//	pos, offset
 		std::vector< std::tuple< int, int > > offsets; // Temp para fazer offsets corretamente
-										// Endereço   , def, const, lista
-		std::map< std::string, std::tuple< unsigned int, bool, bool, int > > Symbols;
+										// Endereço   , def, const, lista, ext, public
+		std::map< std::string, std::tuple< unsigned int, bool, bool, int, bool, bool > > Symbols;
+		std::vector< std::tuple< std::string, unsigned int > > TabelaDefinicao;
+		std::vector< std::tuple< std::string, unsigned int > > TabelaUso;
+		std::string MapaBits;
+		bool teveBegin;
+		bool teveEnd;
 };
 
 #endif // SEMANTICO_HPP

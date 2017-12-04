@@ -7,7 +7,19 @@ Made by Gabriel Barbosa (12/0050935), Vitor XXXXXX (XX/XXXXXXX) and Adarley Gran
 
 #### Compilation instructions
 
-ATTENTION: You'll need a g++ version compatible with the directive -std=c++14
+***ATTENTION***: You'll need a g++ version compatible with the directive -std=c++14
 
-- Run `make release` or `make debug` or simply `make`. E.g. If you're using Windows with mingw32, run `mingw32-make release` or `mingw32-make debug` or simply `mingw32-make`.
-- A `montador`(Linux) \ `montador.exe` (Windows) will show up on the same directory. You can call it as specified by the project document.
+- Run, in the root folder, `make release` or `make debug` or simply `make`. If you're using Windows with mingw32, run `mingw32-make release` or `mingw32-make debug` or simply `mingw32-make`.
+- A `[montador|ligador|carregador]`(Linux) \ `[montador|ligador|carregador].exe` (Windows) will show up on the same directory. You can call it as specified below.
+
+#### Calling instructions
+
+- For calling `montador`, you'll need to pass 1 to 3 `.asm` files. It'll generate one `.o` for each file. Windows example:
+  - `.\montador.exe '.\Arquivos Teste\fat_mod_A.asm' '.\Arquivos Teste\fat_mod_B.asm'`
+
+- For calling `ligador`, you'll need to pass 1 to 3 `.o` files. It'll generate a single file without extension with the same name as the first file. Windows example:
+  - `.\ligador.exe '.\Arquivos Teste\fat_mod_A.o' '.\Arquivos Teste\fat_mod_B.o'`
+
+- For calling `carregador`, you'll need to pass one file without extension followed by memory chunk info. It'll generate a `.im` file. Windows example:
+  - `.\carregador.exe '.\Arquivos Teste\fat_mod_A' 3 10 10 10 100 200 300`
+  - In this case, we have 3 chunks with 10 bytes each located at address 100, 200 and 300, respectively.

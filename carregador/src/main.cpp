@@ -17,7 +17,7 @@ void vetorMemoria(string, int[500], long, int);
 int main(int argc, const char * argv[]) {
     
     std::string fileTitle = argv[1];
-    fileTitle = fileTitle + ".o";
+    // fileTitle = fileTitle + ".o";
     std::ifstream input( fileTitle );
     std::string line;
     
@@ -48,7 +48,7 @@ int main(int argc, const char * argv[]) {
     cout << endl;
     
     //simulacao
-    cout << "---- Início Simulação:" << endl;
+    cout << "---- Inicio Simulacao:" << endl;
     bool executar = true;
     long pos = 0;
     int acumulador = 0;
@@ -150,7 +150,8 @@ int main(int argc, const char * argv[]) {
             }
         }
     }
-    cout << "---- Fim Simulação." << endl << "Espelho de memória após execução:" << endl;
+  
+    cout << "---- Fim Simulacao." << endl << "Espelho de memoria apos execucao:" << endl;
     for (int i = 0; i < tamanho; i++) {
         cout << memoria[i] << " ";
     }
@@ -166,7 +167,8 @@ int main(int argc, const char * argv[]) {
             chunkUnica = i;
         }
     }
-    std::cout << "Memória disponível em bytes para execução:\t" << tamanhoDisponivelMem << std::endl;
+  
+    std::cout << "Memoria disponivel em bytes para execucao:\t" << tamanhoDisponivelMem << std::endl;
     
     if (tamanhoDisponivelMem >= tamanho) {
         //tudo certo, carregar programa em memoria
@@ -224,7 +226,11 @@ int main(int argc, const char * argv[]) {
                     tamanhoEscrito++;
                 }
             }
-            cout << "Código após correção de endereços: " << endl << codigoNovo << endl << endl;
+          
+            cout << "Codigo apos correcao de enderecos: " << endl << codigoNovo << endl << endl;
+            std::ofstream output( fileTitle + ".im" );
+            output << codigoNovo;
+
         }
     }
     else {

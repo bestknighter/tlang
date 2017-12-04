@@ -16,6 +16,13 @@ Parser::Parser()
 			, lineBeingProcessed( 1 ) {
 }
 
+void Parser::Reset() {
+	delete nextToken;
+	nextToken = new Token();
+	lineBeingProcessed = 1;
+	eof = false;
+}
+
 Parser::~Parser() {
 	delete nextToken;
 }
@@ -33,7 +40,7 @@ bool Parser::GetNextExpression( Expression& exp ) {
 	if( nextToken->GetLine() == lineBeingProcessed ) {
 		tokens.push_back( *nextToken );
 	}
-	do { // Obtem todos os tokens da mesma inha
+	do { // Obtem todos os tokens da mesma linha
 		eof = s.GetNextToken( *nextToken );
 		if( nextToken->GetLine() == lineBeingProcessed ) {
 			tokens.push_back( *nextToken );
