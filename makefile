@@ -59,7 +59,8 @@ copy:
 ifeq ($(OS), Windows_NT)
 	-@$(foreach PROG,$(PROGS),$(call run_cmd,copy $(PROG)\$(PROG).exe $(PROG).exe))
 else
-	-@$(foreach PROG,$(PROGS),$(call run_cmd,cp $(PROG)/$(PROG) .))
+	@mkdir -p bin
+	-@$(foreach PROG,$(PROGS),$(call run_cmd,cp $(PROG)/$(PROG) ./bin/$(PROG)))
 endif
 
 clean: clean_inner clean_this
@@ -71,7 +72,8 @@ clean_this:
 ifeq ($(OS), Windows_NT)
 	-@$(foreach PROG,$(PROGS),$(call run_cmd,$(RM) $(PROG).exe))
 else
-	-@$(foreach PROG,$(PROGS),$(call run_cmd,$(RM) $(PROG)))
+	-@$(foreach PROG,$(PROGS),$(call run_cmd,$(RM) ./bin/$(PROG)))
+	@rm -rf bin
 endif
 
 # A linha em branco abaixo de $(1) é de extrema importância! Não apagar!

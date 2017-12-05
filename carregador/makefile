@@ -107,7 +107,7 @@ $(OBJ_PATH)/%.o: $(SRC_PATH)/%.cpp $(DEP_PATH)/%.d | folders
 	$(COMPILER) $(INC_PATHS) $< -c $(FLAGS) -o $@
 
 $(EXEC): $(DEP_FILES) $(OBJ_FILES)
-	$(COMPILER) -o $@ $(OBJ_FILES) $(LIBS)
+	$(COMPILER) -o $@ $(OBJ_FILES) $(LIBS) $(FLAGS)
 
 
 # Regra pra debug
