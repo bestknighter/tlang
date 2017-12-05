@@ -21,7 +21,7 @@ CD = cd
 # Make
 MAKE = make
 
-PROGS = montador ligador carregador
+PROGS = montador ligador carregador tlang
 
 #-------------------------------------------------------------
 # Caso seja Windows											 |
